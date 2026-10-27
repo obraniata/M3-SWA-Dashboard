@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M3 Southwest Asia · Physical Geography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cinzel+Decorative:wght@400;700&family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <?!= include('stylesheet'); ?>
+</head>
+<body>
+
+<div id="login-gate">
+  <div class="lg-box">
+    <div class="lg-emoji">🕌🏜️</div>
+    <div class="lg-topic-badge">M3 · SOCIAL STUDIES 3</div>
+    <div class="lg-title">M3 SOUTHWEST ASIA</div>
+    <div class="lg-title-sub">Physical Geography Lesson</div>
+    <div class="lg-sub">Sign in once so your quiz scores and activity results are saved under your name.</div>
+    <form id="lg-form" onsubmit="return handleLoginSubmit(event)">
+      <div class="lg-field">
+        <label class="lg-label" for="lg-id">Student ID</label>
+        <input class="lg-input" id="lg-id" type="text" inputmode="numeric" maxlength="5" placeholder="e.g. 12345" autocomplete="off">
+        <div class="lg-errmsg" id="lg-id-err"></div>
+      </div>
+      <div class="lg-field">
+        <label class="lg-label" for="lg-name">Full Name</label>
+        <input class="lg-input" id="lg-name" type="text" placeholder="Your full name" autocomplete="off">
+        <div class="lg-errmsg" id="lg-name-err"></div>
+      </div>
+      <div class="lg-field">
+        <label class="lg-label" for="lg-section">Section</label>
+        <select class="lg-select" id="lg-section">
+          <option value="">— select your section —</option>
+          <option value="M3/10">M3/10</option>
+          <option value="M3/11">M3/11</option>
+        </select>
+        <div class="lg-errmsg" id="lg-section-err"></div>
+      </div>
+      <button class="lg-submit" id="lg-submit-btn" type="submit">Enter the Lesson →</button>
+    </form>
+    <div class="lg-note">Your name and section are only used to record your scores in your teacher's gradebook.</div>
+  </div>
+</div>
+
+<div id="save-toast"></div>
+
+<div id="topbar">
+  <button id="hamburger" onclick="toggleSidebar()" title="Menu">☰</button>
+  <div id="topbar-title">
+    <a href="https://www.google.com/earth/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;" title="Open Google Earth in a new tab">
+      <span style="cursor: pointer;">🌏</span> M3 Southwest Asia · Physical Geography
+    </a>
+  </div>
+  <button id="vocab-toggle-btn" onclick="toggleVocabDrawer()">📖 Vocabulary</button>
+  <button id="lg-userbadge" onclick="logoutSession()" title="Not you? Click to switch user" aria-label="Switch student account">
+    <span class="lg-ub-avatar" aria-hidden="true">👤</span>
+    <span class="lg-ub-info">
+      <span class="lg-ub-full" id="lg-userbadge-text"></span>
+    </span>
+    <span class="lg-ub-switch-tag" aria-hidden="true">⇄ Switch</span>
+  </button>
+  <a class="tb-badge" href="https://docs.google.com/spreadsheets/d/1ffriu1qebQL5xjsnfn7FGBnGKyNlynw-928wK1kXmw0" target="_blank" rel="noopener noreferrer" title="Open Class Data Sheet">M3 📊</a>
+</div>
+<div id="prog-wrap"><div id="prog-bar"></div></div>
+
+<div id="app">
+  <nav id="lsb">
+    <div class="nav-label">🗺️ Topics</div>
+    <details class="ng" open>
+      <summary>🏔️ Landforms</summary>
+      <a class="nsi active" onclick="loadSec('landforms')">Mountains & Plateaus</a>
+      <a class="nsi" onclick="loadSec('plains')">Plains & River Valleys</a>
+      <a class="nsi" onclick="loadSec('deserts')">Deserts & Basins</a>
+      <a class="nsi" onclick="loadSec('coasts')">Coasts & Islands</a>
+    </details>
+    <details class="ng">
+      <summary>🌡️ Climate & Vegetation</summary>
+      <a class="nsi" onclick="loadSec('climate')">Climate Zones</a>
+      <a class="nsi" onclick="loadSec('vegetation')">Vegetation Types</a>
+    </details>
+    <details class="ng">
+      <summary>⛏️ Resources & Land Use</summary>
+      <a class="nsi" onclick="loadSec('resources')">Mineral Resources</a>
+      <a class="nsi" onclick="loadSec('landuse')">Land Use</a>
+    </details>
+    <div class="nav-label">📌 Quick</div>
+    <a class="nsi" onclick="openVideo('dEwW1r_HcyU')">▶ Watch Intro</a>
+  </nav>
+
+  <main id="cpane" class="sb-closed"><div id="ca" class="fi"></div></main>
+
+  <aside id="vd">
+    <div class="vd-head"><h3>📖 Word List</h3><button class="vd-close" onclick="toggleVocabDrawer()">✕</button></div>
+    <input class="vd-search" type="text" placeholder="Find a word…" oninput="filterVocab(this.value)">
+    <div id="vd-list"></div>
+  </aside>
+</div>
+
+<div id="pm" class="mbk" onclick="closeBk(event,'pm')"><div class="mbox" onclick="event.stopPropagation()"><div class="mtop"><div class="mtitle" id="pm-title"></div><button class="mclose" onclick="closeM('pm')">✕</button></div><div class="mbody" id="pm-body"></div></div></div>
+<div id="nm" class="mnbk" onclick="closeBk(event,'nm')"><div class="mnbox" onclick="event.stopPropagation()"><div class="mtop"><div class="mtitle" id="nm-title"></div><button class="mclose" onclick="closeM('nm')">✕</button></div><div class="mbody" id="nm-body"></div></div></div>
+<div id="tm" class="mtbk" onclick="closeBk(event,'tm')"><div class="mtbox" onclick="event.stopPropagation()"><div class="mtop"><div class="mtitle">▶ Watch & Learn</div><button class="mclose" onclick="closeM('tm')">✕</button></div><div class="mbody"><div class="vid-wrap" id="vc"></div></div></div></div>
+<div id="qm" class="mbk" onclick="closeBk(event,'qm')"><div class="mbox" onclick="event.stopPropagation()" style="max-width:580px"><div class="mtop"><div class="mtitle" id="qm-title">Quiz 🌟</div><button class="mclose" onclick="closeM('qm')">✕</button></div><div class="mbody" id="qm-body"></div></div></div>
+<div id="gtm" class="mbk" onclick="closeBk(event,'gtm')"><div class="mbox" onclick="event.stopPropagation()" style="max-width:520px"><div class="mtop"><div class="mtitle" id="gtm-title">Word Tag Results 🏆</div><button class="mclose" onclick="closeM('gtm')">✕</button></div><div class="mbody" id="gtm-body"></div></div></div>
+
+<div id="drill-zagros" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-zagros')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏔️ Zagros Mountains</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-zagros')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏔️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A long mountain range in southwestern Iran, extending along the border with Iraq. Peaks exceed 4,000 meters.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🛢️</span>
+          <div>
+            <span class="drill-item-title">Oil Reserves</span>
+            <span class="drill-item-desc">The Zagros fold belt contains some of the world's largest oil and natural gas reserves.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">Water Source</span>
+            <span class="drill-item-desc">Snowmelt from the Zagros feeds major rivers like the Tigris and Euphrates.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-taurus" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-taurus')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">⛰️ Taurus Mountains</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-taurus')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏔️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A mountain range in southern Turkey, running parallel to the Mediterranean coast.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">Rivers</span>
+            <span class="drill-item-desc">Source of the Tigris and Euphrates rivers — the lifelines of Mesopotamia.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏛️</span>
+          <div>
+            <span class="drill-item-title">Historical Significance</span>
+            <span class="drill-item-desc">Formed a natural barrier between the Mediterranean coast and the interior of Anatolia.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-elburz" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-elburz')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏔️ Elburz Mountains</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-elburz')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏔️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A mountain range in northern Iran, separating the Caspian Sea from the Iranian Plateau.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🗻</span>
+          <div>
+            <span class="drill-item-title">Mount Damavand</span>
+            <span class="drill-item-desc">The highest peak in Iran at 5,610 meters — a dormant volcano.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌲</span>
+          <div>
+            <span class="drill-item-title">Vegetation</span>
+            <span class="drill-item-desc">The northern slopes receive more rainfall and support dense forests.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-anatolian" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-anatolian')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏜️ Anatolian Plateau</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-anatolian')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏔️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A large plateau in central Turkey, averaging about 1,000 meters in elevation.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌾</span>
+          <div>
+            <span class="drill-item-title">Agriculture</span>
+            <span class="drill-item-desc">Known for wheat, barley, and livestock farming — the "breadbasket" of Turkey.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏛️</span>
+          <div>
+            <span class="drill-item-title">Historical Significance</span>
+            <span class="drill-item-desc">Home to ancient civilizations including the Hittites and Phrygians.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-iranian-plateau" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-iranian-plateau')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏜️ Iranian Plateau</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-iranian-plateau')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏔️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A large plateau covering most of Iran, Afghanistan, and Pakistan — averaging 1,200 meters in elevation.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Deserts</span>
+            <span class="drill-item-desc">Contains the Dasht-e Kavir and Dasht-e Lut — some of the driest and hottest places on Earth.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🛢️</span>
+          <div>
+            <span class="drill-item-title">Resources</span>
+            <span class="drill-item-desc">Rich in oil, natural gas, and minerals — a key strategic region.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-arabian-peninsula" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-arabian-peninsula')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏜️ Arabian Peninsula</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-arabian-peninsula')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A large peninsula in Southwest Asia, bounded by the Red Sea, Arabian Sea, and Persian Gulf.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🛢️</span>
+          <div>
+            <span class="drill-item-title">Oil Reserves</span>
+            <span class="drill-item-desc">Contains some of the world's largest oil and natural gas reserves — the economic backbone of the region.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Deserts</span>
+            <span class="drill-item-desc">Dominated by the Rub' al Khali (Empty Quarter) — the largest continuous sand desert in the world.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-tigris-euphrates" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-tigris-euphrates')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌊 Tigris-Euphrates Valley</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-tigris-euphrates')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">Mesopotamia</span>
+            <span class="drill-item-desc">The "Land Between the Rivers" — one of the cradles of civilization, home to Sumer, Babylon, and Assyria.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌾</span>
+          <div>
+            <span class="drill-item-title">Agriculture</span>
+            <span class="drill-item-desc">The fertile floodplains supported the world's first cities and the invention of writing.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">⚠️</span>
+          <div>
+            <span class="drill-item-title">Modern Challenges</span>
+            <span class="drill-item-desc">Water sharing disputes between Turkey, Syria, and Iraq — dams reduce downstream flow.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-nile" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-nile')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌊 Nile River Valley</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-nile')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">The Nile</span>
+            <span class="drill-item-desc">The longest river in the world, flowing north through Egypt to the Mediterranean Sea.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏛️</span>
+          <div>
+            <span class="drill-item-title">Ancient Egypt</span>
+            <span class="drill-item-desc">The Nile's annual floods deposited fertile silt, enabling one of the world's greatest ancient civilizations.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏗️</span>
+          <div>
+            <span class="drill-item-title">Aswan High Dam</span>
+            <span class="drill-item-desc">Built in the 1960s to control flooding and generate hydroelectric power.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-jordan" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-jordan')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌊 Jordan River Valley</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-jordan')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">The Jordan River</span>
+            <span class="drill-item-desc">A major river in the Middle East, flowing through the Jordan Rift Valley to the Dead Sea.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🙏</span>
+          <div>
+            <span class="drill-item-title">Religious Significance</span>
+            <span class="drill-item-desc">Sacred to Judaism, Christianity, and Islam — site of many biblical events.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">⚠️</span>
+          <div>
+            <span class="drill-item-title">Water Scarcity</span>
+            <span class="drill-item-desc">Heavy water use for irrigation has reduced the river's flow significantly.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-rub-al-khali" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-rub-al-khali')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏜️ Rub' al Khali (Empty Quarter)</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-rub-al-khali')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">The largest continuous sand desert in the world, covering much of the southern Arabian Peninsula.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">☀️</span>
+          <div>
+            <span class="drill-item-title">Climate</span>
+            <span class="drill-item-desc">One of the hottest and driest places on Earth — summer temperatures exceed 50°C.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🛢️</span>
+          <div>
+            <span class="drill-item-title">Oil Reserves</span>
+            <span class="drill-item-desc">Beneath the sands lie some of the world's largest oil fields.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-syrian-desert" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-syrian-desert')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏜️ Syrian Desert</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-syrian-desert')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A vast desert region spanning parts of Syria, Jordan, Iraq, and Saudi Arabia.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🐪</span>
+          <div>
+            <span class="drill-item-title">Nomadic Life</span>
+            <span class="drill-item-desc">Traditionally home to Bedouin tribes who herded camels and sheep.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏛️</span>
+          <div>
+            <span class="drill-item-title">Ancient Sites</span>
+            <span class="drill-item-desc">Contains the ancient city of Palmyra — a UNESCO World Heritage site.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-dasht-lut" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-dasht-lut')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏜️ Dasht-e Lut</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-dasht-lut')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A large salt desert in southeastern Iran — one of the hottest places on Earth.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌡️</span>
+          <div>
+            <span class="drill-item-title">Extreme Heat</span>
+            <span class="drill-item-desc">Recorded surface temperatures of 70.7°C — the highest ever measured on Earth.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🪨</span>
+          <div>
+            <span class="drill-item-title">Unique Features</span>
+            <span class="drill-item-desc">Contains giant sand castles (yardangs) carved by wind erosion.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-dasht-kavir" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-dasht-kavir')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏜️ Dasht-e Kavir</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-dasht-kavir')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A large salt desert in central Iran — one of the driest regions in the world.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🧂</span>
+          <div>
+            <span class="drill-item-title">Salt Flats</span>
+            <span class="drill-item-desc">Contains vast salt flats and salt marshes — remnants of ancient seas.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌵</span>
+          <div>
+            <span class="drill-item-title">Vegetation</span>
+            <span class="drill-item-desc">Sparse desert vegetation adapted to extreme aridity and salinity.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-persian-gulf" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-persian-gulf')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌊 Persian Gulf</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-persian-gulf')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A shallow marginal sea between the Arabian Peninsula and Iran — vital for global oil trade.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🛢️</span>
+          <div>
+            <span class="drill-item-title">Oil Production</span>
+            <span class="drill-item-desc">The world's largest oil-producing region — major ports in Saudi Arabia, UAE, Kuwait, and Iran.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">⚠️</span>
+          <div>
+            <span class="drill-item-title">Strategic Importance</span>
+            <span class="drill-item-desc">The Strait of Hormuz is a critical chokepoint for global oil shipments.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-red-sea" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-red-sea')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌊 Red Sea</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-red-sea')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A seawater inlet of the Indian Ocean, lying between Africa and the Arabian Peninsula.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🐠</span>
+          <div>
+            <span class="drill-item-title">Coral Reefs</span>
+            <span class="drill-item-desc">Home to some of the world's most pristine coral reefs and marine biodiversity.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🚢</span>
+          <div>
+            <span class="drill-item-title">Trade Route</span>
+            <span class="drill-item-desc">The Suez Canal connects the Red Sea to the Mediterranean — one of the world's busiest shipping lanes.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-arabian-sea" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-arabian-sea')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌊 Arabian Sea</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-arabian-sea')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">A region of the northern Indian Ocean, bounded by the Arabian Peninsula, Iran, Pakistan, and India.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🐟</span>
+          <div>
+            <span class="drill-item-title">Fisheries</span>
+            <span class="drill-item-desc">Important fishing grounds for sardines, mackerel, and shrimp.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🚢</span>
+          <div>
+            <span class="drill-item-title">Trade Route</span>
+            <span class="drill-item-desc">A major shipping route connecting Europe, the Middle East, and Asia.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-mediterranean" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-mediterranean')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌊 Mediterranean Coast</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-mediterranean')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">Geography</span>
+            <span class="drill-item-desc">The eastern Mediterranean coast, including Turkey, Syria, Lebanon, and Israel.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏛️</span>
+          <div>
+            <span class="drill-item-title">Historical Significance</span>
+            <span class="drill-item-desc">The Levant — a crossroads of civilizations, trade, and culture for thousands of years.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌾</span>
+          <div>
+            <span class="drill-item-title">Agriculture</span>
+            <span class="drill-item-desc">Mediterranean climate supports olives, citrus, grapes, and wheat.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-desert-climate" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-desert-climate')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌡️ Desert Climate</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-desert-climate')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">☀️</span>
+          <div>
+            <span class="drill-item-title">Characteristics</span>
+            <span class="drill-item-desc">Very hot days, cool nights, and extremely low rainfall — less than 100mm per year in many areas.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Rub' al Khali, Syrian Desert, Dasht-e Lut, Dasht-e Kavir, and the Negev Desert.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌵</span>
+          <div>
+            <span class="drill-item-title">Vegetation</span>
+            <span class="drill-item-desc">Sparse drought-resistant shrubs, cacti, and hardy grasses.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-mediterranean-climate" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-mediterranean-climate')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌡️ Mediterranean Climate</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-mediterranean-climate')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">☀️</span>
+          <div>
+            <span class="drill-item-title">Characteristics</span>
+            <span class="drill-item-desc">Hot, dry summers and mild, wet winters — a distinctive climate found around the Mediterranean Sea.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌿</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Coastal Turkey, Syria, Lebanon, Israel, and parts of Iran.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🫒</span>
+          <div>
+            <span class="drill-item-title">Vegetation</span>
+            <span class="drill-item-desc">Olive trees, citrus fruits, grapes, and evergreen shrubs.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-steppe-climate" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-steppe-climate')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌡️ Semi-Arid Steppe Climate</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-steppe-climate')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌾</span>
+          <div>
+            <span class="drill-item-title">Characteristics</span>
+            <span class="drill-item-desc">Hot summers, cold winters, and moderate rainfall — transitional between desert and humid climates.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌿</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Anatolian Plateau, Iranian Plateau, and parts of the Arabian Peninsula.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🐑</span>
+          <div>
+            <span class="drill-item-title">Vegetation</span>
+            <span class="drill-item-desc">Grasses and shrubs — supports nomadic herding and dryland farming.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-highland-climate" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-highland-climate')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌡️ Highland Climate</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-highland-climate')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏔️</span>
+          <div>
+            <span class="drill-item-title">Characteristics</span>
+            <span class="drill-item-desc">Temperatures decrease with altitude — cold winters and cool summers in high mountain regions.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">❄️</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Zagros, Taurus, Elburz mountains, and the Iranian Plateau.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌲</span>
+          <div>
+            <span class="drill-item-title">Vegetation</span>
+            <span class="drill-item-desc">Coniferous forests on lower slopes, alpine grasses and mosses at higher elevations.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-desert-vegetation" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-desert-vegetation')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌵 Desert Vegetation</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-desert-vegetation')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌵</span>
+          <div>
+            <span class="drill-item-title">Plants</span>
+            <span class="drill-item-desc">Cacti, succulents, thorny shrubs, and drought-resistant grasses adapted to extreme aridity.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏜️</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Rub' al Khali, Syrian Desert, Dasht-e Lut, Dasht-e Kavir, Negev Desert.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">💧</span>
+          <div>
+            <span class="drill-item-title">Adaptations</span>
+            <span class="drill-item-desc">Deep roots, water storage tissues, and waxy coatings to reduce water loss.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-mediterranean-vegetation" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-mediterranean-vegetation')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🫒 Mediterranean Vegetation</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-mediterranean-vegetation')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🫒</span>
+          <div>
+            <span class="drill-item-title">Plants</span>
+            <span class="drill-item-desc">Olive trees, citrus, grapes, figs, and evergreen shrubs like maquis and garrigue.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌿</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Coastal Turkey, Syria, Lebanon, Israel, and parts of Iran.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌡️</span>
+          <div>
+            <span class="drill-item-title">Adaptations</span>
+            <span class="drill-item-desc">Small, waxy leaves to reduce water loss during hot, dry summers.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-steppe-vegetation" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-steppe-vegetation')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌾 Steppe Vegetation</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-steppe-vegetation')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌾</span>
+          <div>
+            <span class="drill-item-title">Plants</span>
+            <span class="drill-item-desc">Short grasses, herbs, and drought-resistant shrubs adapted to semi-arid conditions.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🐑</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Anatolian Plateau, Iranian Plateau, and parts of the Arabian Peninsula.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌱</span>
+          <div>
+            <span class="drill-item-title">Adaptations</span>
+            <span class="drill-item-desc">Deep root systems and the ability to go dormant during dry periods.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-montane-forest" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-montane-forest')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌲 Montane Forest</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-montane-forest')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌲</span>
+          <div>
+            <span class="drill-item-title">Plants</span>
+            <span class="drill-item-desc">Oak, pine, cedar, and juniper trees in mountain regions with moderate rainfall.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏔️</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Zagros, Taurus, and Elburz mountains.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🪵</span>
+          <div>
+            <span class="drill-item-title">Importance</span>
+            <span class="drill-item-desc">Important for timber, fuel, and watershed protection.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-oil" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-oil')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🛢️ Oil & Natural Gas</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-oil')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🛢️</span>
+          <div>
+            <span class="drill-item-title">Major Deposits</span>
+            <span class="drill-item-desc">Saudi Arabia, Iran, Iraq, Kuwait, UAE, and Qatar — containing over half of the world's proven oil reserves.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">⚡</span>
+          <div>
+            <span class="drill-item-title">Economic Impact</span>
+            <span class="drill-item-desc">Oil exports drive the economies of many Southwest Asian countries.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌍</span>
+          <div>
+            <span class="drill-item-title">Global Significance</span>
+            <span class="drill-item-desc">The region is the world's most important energy supplier.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-minerals" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-minerals')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">⚒️ Mineral Resources</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-minerals')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">⛏️</span>
+          <div>
+            <span class="drill-item-title">Minerals</span>
+            <span class="drill-item-desc">Iron ore, copper, zinc, lead, gold, and phosphate — found in various parts of the region.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🏗️</span>
+          <div>
+            <span class="drill-item-title">Locations</span>
+            <span class="drill-item-desc">Turkey, Iran, and the Arabian Peninsula — important mining regions.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">💼</span>
+          <div>
+            <span class="drill-item-title">Economic Importance</span>
+            <span class="drill-item-desc">Mining and mineral processing contribute significantly to regional economies.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-water-resources" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-water-resources')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">💧 Water Resources</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-water-resources')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">💧</span>
+          <div>
+            <span class="drill-item-title">Major Rivers</span>
+            <span class="drill-item-desc">Tigris, Euphrates, Nile, and Jordan — lifelines for agriculture and drinking water.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌊</span>
+          <div>
+            <span class="drill-item-title">Water Scarcity</span>
+            <span class="drill-item-desc">The region is the most water-scarce in the world — desalination is increasingly important.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🤝</span>
+          <div>
+            <span class="drill-item-title">Trans-boundary Issues</span>
+            <span class="drill-item-desc">Water sharing between Turkey, Syria, Iraq, and other countries is a sensitive political issue.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-agriculture" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-agriculture')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌾 Agricultural Land Use</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-agriculture')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌾</span>
+          <div>
+            <span class="drill-item-title">Staple Crops</span>
+            <span class="drill-item-desc">Wheat, barley, rice, and dates are the primary food crops grown across the region.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🫒</span>
+          <div>
+            <span class="drill-item-title">Cash Crops</span>
+            <span class="drill-item-desc">Olives, citrus, cotton, and tobacco — major exports.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">⚠️</span>
+          <div>
+            <span class="drill-item-title">Challenges</span>
+            <span class="drill-item-desc">Water scarcity, soil salinization, and climate change threaten agricultural sustainability.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-urban" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-urban')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🏙️ Urban Development</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-urban')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🏙️</span>
+          <div>
+            <span class="drill-item-title">Major Cities</span>
+            <span class="drill-item-desc">Istanbul, Tehran, Baghdad, Riyadh, Dubai, and Cairo — major urban centers in the region.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🌆</span>
+          <div>
+            <span class="drill-item-title">Rapid Urbanization</span>
+            <span class="drill-item-desc">Cities are growing rapidly due to oil wealth, job opportunities, and population growth.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">⚠️</span>
+          <div>
+            <span class="drill-item-title">Challenges</span>
+            <span class="drill-item-desc">Overcrowding, pollution, traffic congestion, and water shortages.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-pastoralism" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-pastoralism')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🐪 Pastoralism & Nomadic Herding</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-pastoralism')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🐪</span>
+          <div>
+            <span class="drill-item-title">Nomadic Herding</span>
+            <span class="drill-item-desc">Traditional Bedouin and Kurdish nomads herd camels, sheep, and goats across the region.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🐑</span>
+          <div>
+            <span class="drill-item-title">Livestock</span>
+            <span class="drill-item-desc">Sheep and goats are important for meat, milk, and wool production.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">⚠️</span>
+          <div>
+            <span class="drill-item-title">Modern Challenges</span>
+            <span class="drill-item-desc">Urbanization, oil exploration, and climate change are changing traditional lifestyles.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="drill-forestry" class="drill-backdrop" onclick="closeDrillOverlay(event,'drill-forestry')">
+  <div class="drill-modal" onclick="event.stopPropagation()">
+    <div class="drill-header">
+      <span class="drill-title">🌳 Forestry & Conservation</span>
+      <button class="drill-close-btn" onclick="closeDrillOverlay(event,'drill-forestry')">✕</button>
+    </div>
+    <div class="drill-body">
+      <div class="drill-timeline">
+        <div class="drill-item">
+          <span class="drill-icon">🌳</span>
+          <div>
+            <span class="drill-item-title">Forest Cover</span>
+            <span class="drill-item-desc">Forests cover a small percentage of the region — mostly in mountainous areas.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">🐆</span>
+          <div>
+            <span class="drill-item-title">Conservation</span>
+            <span class="drill-item-desc">National parks and reserves protect endangered species like the Arabian leopard and Arabian oryx.</span>
+          </div>
+        </div>
+        <div class="drill-item">
+          <span class="drill-icon">⚠️</span>
+          <div>
+            <span class="drill-item-title">Deforestation</span>
+            <span class="drill-item-desc">Overgrazing, logging, and urban expansion have reduced forest cover.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<?!= include('script'); ?>
+</body>
+</html>

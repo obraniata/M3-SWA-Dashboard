@@ -1,0 +1,942 @@
+<script>
+/* ============================================================
+   DATA: Southwest Asia Physical Geography
+   ============================================================ */
+const SECS = {
+  'landforms': {
+    emoji:'🏔️', title:'Mountains & Plateaus',
+    eye:'The highlands of Southwest Asia',
+    sub:'Southwest Asia is dominated by rugged mountain ranges and high plateaus — from the Zagros and Taurus Mountains to the vast Arabian and Iranian Plateaus.',
+    layout:'timeline',
+    quiz:'landforms',
+    grammar:{
+      passage:`<span class="tw" data-ans="7" onclick="tagWord(this)">Mountains</span> <span class="tw" data-ans="2" onclick="tagWord(this)">rise</span> <span class="tw" data-ans="3" onclick="tagWord(this)">high</span> <span class="tw" data-ans="6" onclick="tagWord(this)">in</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Southwest</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Asia</span>. The <span class="tw" data-ans="7" onclick="tagWord(this)">Zagros</span> <span class="tw" data-ans="1" onclick="tagWord(this)">mountains</span> <span class="tw" data-ans="2" onclick="tagWord(this)">stretch</span> <span class="tw" data-ans="6" onclick="tagWord(this)">across</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Iran</span>. The <span class="tw" data-ans="7" onclick="tagWord(this)">Taurus</span> <span class="tw" data-ans="1" onclick="tagWord(this)">mountains</span> <span class="tw" data-ans="2" onclick="tagWord(this)">run</span> <span class="tw" data-ans="6" onclick="tagWord(this)">through</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Turkey</span>, <span class="tw" data-ans="5" onclick="tagWord(this)">and</span> <span class="tw" data-ans="2" onclick="tagWord(this)">feed</span> <span class="tw" data-ans="3" onclick="tagWord(this)">great</span> <span class="tw" data-ans="1" onclick="tagWord(this)">rivers</span>.`
+    },
+    events:[
+      {era:'Zagros Mountains',icon:'🏔️',title:'Oil-Rich Range',body:'A long mountain range in southwestern Iran, extending along the border with Iraq. Contains some of the world\'s largest oil and natural gas reserves. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-zagros\')">📖 Learn more</span>'},
+      {era:'Taurus Mountains',icon:'⛰️',title:'Source of Rivers',body:'A mountain range in southern Turkey, running parallel to the Mediterranean coast. Source of the Tigris and Euphrates rivers. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-taurus\')">📖 Learn more</span>'},
+      {era:'Elburz Mountains',icon:'🏔️',title:'Northern Iran',body:'A mountain range in northern Iran, separating the Caspian Sea from the Iranian Plateau. Home to Mount Damavand. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-elburz\')">📖 Learn more</span>'},
+      {era:'Anatolian Plateau',icon:'🏜️',title:'Central Turkey',body:'A large plateau in central Turkey, averaging about 1,000 meters in elevation. Known for wheat and livestock farming. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-anatolian\')">📖 Learn more</span>'},
+      {era:'Iranian Plateau',icon:'🏜️',title:'Vast Interior',body:'A large plateau covering most of Iran, Afghanistan, and Pakistan. Contains some of the driest and hottest places on Earth. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-iranian-plateau\')">📖 Learn more</span>'},
+      {era:'Arabian Peninsula',icon:'🏜️',title:'Oil-Rich Land',body:'A large peninsula in Southwest Asia, bounded by the Red Sea, Arabian Sea, and Persian Gulf. Contains some of the world\'s largest oil reserves. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-arabian-peninsula\')">📖 Learn more</span>'},
+    ],
+    vocab:['Zagros','Taurus','plateau','peninsula','oil reserves'],
+    activity: null
+  },
+  'plains': {
+    emoji:'🌾', title:'Plains & River Valleys',
+    eye:'Cradles of civilization',
+    sub:'Southwest Asia\'s great river valleys — the Tigris, Euphrates, Nile, and Jordan — were the cradles of ancient civilizations and remain vital today.',
+    layout:'timeline',
+    quiz:'plains',
+    grammar:{
+      passage:`<span class="tw" data-ans="1" onclick="tagWord(this)">Rivers</span> <span class="tw" data-ans="2" onclick="tagWord(this)">shape</span> <span class="tw" data-ans="3" onclick="tagWord(this)">fertile</span> <span class="tw" data-ans="1" onclick="tagWord(this)">plains</span>. The <span class="tw" data-ans="7" onclick="tagWord(this)">Tigris</span> <span class="tw" data-ans="5" onclick="tagWord(this)">and</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Euphrates</span> <span class="tw" data-ans="2" onclick="tagWord(this)">flow</span> <span class="tw" data-ans="6" onclick="tagWord(this)">through</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Iraq</span>. The <span class="tw" data-ans="7" onclick="tagWord(this)">Nile</span> <span class="tw" data-ans="2" onclick="tagWord(this)">runs</span> <span class="tw" data-ans="6" onclick="tagWord(this)">through</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Egypt</span>, <span class="tw" data-ans="5" onclick="tagWord(this)">but</span> the <span class="tw" data-ans="7" onclick="tagWord(this)">Jordan</span> <span class="tw" data-ans="2" onclick="tagWord(this)">flows</span> <span class="tw" data-ans="6" onclick="tagWord(this)">to</span> the <span class="tw" data-ans="3" onclick="tagWord(this)">holy</span> <span class="tw" data-ans="1" onclick="tagWord(this)">Dead</span> <span class="tw" data-ans="1" onclick="tagWord(this)">Sea</span>.`
+    },
+    events:[
+      {era:'Tigris-Euphrates Valley',icon:'🌊',title:'Mesopotamia',body:'The "Land Between the Rivers" — one of the cradles of civilization, home to Sumer, Babylon, and Assyria. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-tigris-euphrates\')">📖 Learn more</span>'},
+      {era:'Nile River Valley',icon:'🌊',title:'Longest River',body:'The longest river in the world, flowing north through Egypt to the Mediterranean Sea. Supported ancient Egyptian civilization. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-nile\')">📖 Learn more</span>'},
+      {era:'Jordan River Valley',icon:'🌊',title:'Sacred River',body:'A major river in the Middle East, flowing through the Jordan Rift Valley to the Dead Sea. Sacred to Judaism, Christianity, and Islam. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-jordan\')">📖 Learn more</span>'},
+    ],
+    vocab:['Tigris','Euphrates','Nile','Jordan','Mesopotamia'],
+    activity: null
+  },
+  'deserts': {
+    emoji:'🏜️', title:'Deserts & Basins',
+    eye:'Arid lands of Southwest Asia',
+    sub:'Southwest Asia is the most arid region in the world, containing vast deserts like the Rub\' al Khali, Syrian Desert, and the Dasht-e Lut and Dasht-e Kavir.',
+    layout:'timeline',
+    quiz:'deserts',
+    grammar:{
+      passage:`<span class="tw" data-ans="1" onclick="tagWord(this)">Deserts</span> <span class="tw" data-ans="2" onclick="tagWord(this)">cover</span> <span class="tw" data-ans="3" onclick="tagWord(this)">large</span> <span class="tw" data-ans="1" onclick="tagWord(this)">areas</span> <span class="tw" data-ans="6" onclick="tagWord(this)">of</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Southwest</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Asia</span>. The <span class="tw" data-ans="7" onclick="tagWord(this)">Rub</span> <span class="tw" data-ans="7" onclick="tagWord(this)">al</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Khali</span> <span class="tw" data-ans="2" onclick="tagWord(this)">spans</span> the <span class="tw" data-ans="7" onclick="tagWord(this)">Arabian</span> <span class="tw" data-ans="1" onclick="tagWord(this)">Peninsula</span> <span class="tw" data-ans="5" onclick="tagWord(this)">and</span> <span class="tw" data-ans="2" onclick="tagWord(this)">holds</span> <span class="tw" data-ans="3" onclick="tagWord(this)">vast</span> <span class="tw" data-ans="1" onclick="tagWord(this)">oil</span> <span class="tw" data-ans="1" onclick="tagWord(this)">fields</span> <span class="tw" data-ans="6" onclick="tagWord(this)">beneath</span> its <span class="tw" data-ans="1" onclick="tagWord(this)">sands</span>.`
+    },
+    events:[
+      {era:'Rub\' al Khali',icon:'🏜️',title:'Empty Quarter',body:'The largest continuous sand desert in the world, covering much of the southern Arabian Peninsula. One of the hottest and driest places on Earth. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-rub-al-khali\')">📖 Learn more</span>'},
+      {era:'Syrian Desert',icon:'🏜️',title:'Vast Arid Region',body:'A vast desert region spanning parts of Syria, Jordan, Iraq, and Saudi Arabia. Home to ancient sites like Palmyra. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-syrian-desert\')">📖 Learn more</span>'},
+      {era:'Dasht-e Lut',icon:'🏜️',title:'Hottest Place on Earth',body:'A large salt desert in southeastern Iran — recorded surface temperatures of 70.7°C, the highest ever measured on Earth. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-dasht-lut\')">📖 Learn more</span>'},
+      {era:'Dasht-e Kavir',icon:'🏜️',title:'Salt Desert',body:'A large salt desert in central Iran — one of the driest regions in the world. Contains vast salt flats and salt marshes. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-dasht-kavir\')">📖 Learn more</span>'},
+    ],
+    vocab:['Rub\' al Khali','desert','arid','salt flat','Empty Quarter'],
+    activity: null
+  },
+  'coasts': {
+    emoji:'🌊', title:'Coasts & Islands',
+    eye:'Land meeting the sea',
+    sub:'Southwest Asia has coastlines along the Persian Gulf, Red Sea, Arabian Sea, and Mediterranean — vital for trade, fishing, and oil exports.',
+    layout:'timeline',
+    quiz:'coasts',
+    grammar:{
+      passage:`<span class="tw" data-ans="1" onclick="tagWord(this)">Coastlines</span> <span class="tw" data-ans="2" onclick="tagWord(this)">border</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Southwest</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Asia</span>. The <span class="tw" data-ans="7" onclick="tagWord(this)">Persian</span> <span class="tw" data-ans="1" onclick="tagWord(this)">Gulf</span> <span class="tw" data-ans="2" onclick="tagWord(this)">lies</span> <span class="tw" data-ans="6" onclick="tagWord(this)">to</span> the <span class="tw" data-ans="3" onclick="tagWord(this)">east</span>, <span class="tw" data-ans="5" onclick="tagWord(this)">and</span> the <span class="tw" data-ans="7" onclick="tagWord(this)">Red</span> <span class="tw" data-ans="1" onclick="tagWord(this)">Sea</span> <span class="tw" data-ans="2" onclick="tagWord(this)">lies</span> <span class="tw" data-ans="6" onclick="tagWord(this)">to</span> the <span class="tw" data-ans="3" onclick="tagWord(this)">west</span>.`
+    },
+    events:[
+      {era:'Persian Gulf',icon:'🌊',title:'Oil Trade Hub',body:'A shallow marginal sea between the Arabian Peninsula and Iran — vital for global oil trade. The Strait of Hormuz is a critical chokepoint. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-persian-gulf\')">📖 Learn more</span>'},
+      {era:'Red Sea',icon:'🌊',title:'Coral Reefs & Trade',body:'A seawater inlet of the Indian Ocean, lying between Africa and the Arabian Peninsula. The Suez Canal connects it to the Mediterranean. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-red-sea\')">📖 Learn more</span>'},
+      {era:'Arabian Sea',icon:'🌊',title:'Major Shipping Route',body:'A region of the northern Indian Ocean, bounded by the Arabian Peninsula, Iran, Pakistan, and India. Important for fisheries and trade. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-arabian-sea\')">📖 Learn more</span>'},
+      {era:'Mediterranean Coast',icon:'🌊',title:'The Levant',body:'The eastern Mediterranean coast, including Turkey, Syria, Lebanon, and Israel. A crossroads of civilizations for thousands of years. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-mediterranean\')">📖 Learn more</span>'},
+    ],
+    vocab:['Persian Gulf','Red Sea','Arabian Sea','Mediterranean','Strait of Hormuz'],
+    activity: null
+  },
+  'climate': {
+    emoji:'🌡️', title:'Climate Zones of Southwest Asia',
+    eye:'Diverse climates across the region',
+    sub:'Southwest Asia has a variety of climate types — from extremely hot deserts to Mediterranean coasts and cold highlands — due to its location and diverse landforms.',
+    layout:'versus',
+    quiz:'climate',
+    grammar:{
+      passage:`<span class="tw" data-ans="1" onclick="tagWord(this)">Climate</span> <span class="tw" data-ans="2" onclick="tagWord(this)">varies</span> <span class="tw" data-ans="6" onclick="tagWord(this)">across</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Southwest</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Asia</span>. The <span class="tw" data-ans="1" onclick="tagWord(this)">desert</span> <span class="tw" data-ans="2" onclick="tagWord(this)">has</span> <span class="tw" data-ans="3" onclick="tagWord(this)">hot</span> <span class="tw" data-ans="1" onclick="tagWord(this)">days</span>, <span class="tw" data-ans="5" onclick="tagWord(this)">but</span> the <span class="tw" data-ans="1" onclick="tagWord(this)">highlands</span> <span class="tw" data-ans="2" onclick="tagWord(this)">have</span> <span class="tw" data-ans="3" onclick="tagWord(this)">cold</span> <span class="tw" data-ans="1" onclick="tagWord(this)">winters</span> <span class="tw" data-ans="6" onclick="tagWord(this)">at</span> <span class="tw" data-ans="3" onclick="tagWord(this)">high</span> <span class="tw" data-ans="1" onclick="tagWord(this)">elevations</span>.`
+    },
+    left:{title:'Climate Zone',col:'var(--seafoam)'},
+    right:{title:'Characteristics',col:'var(--coral)'},
+    rows:[
+      {label:'Desert (Arid)',left:'Very Hot Days · Cool Nights · Dry. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-desert-climate\')">Rub\' al Khali, Dasht-e Lut</span>',right:'Extremely low rainfall (less than 100mm per year). Sparse vegetation and extreme temperature swings.'},
+      {label:'Mediterranean',left:'Hot Dry Summers · Mild Wet Winters. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-mediterranean-climate\')">Coastal Turkey, Lebanon</span>',right:'Distinctive climate around the Mediterranean Sea. Supports olives, citrus, and grapes.'},
+      {label:'Semi-Arid Steppe',left:'Hot Summers · Cold Winters · Moderate Rain. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-steppe-climate\')">Anatolian Plateau, Iranian Plateau</span>',right:'Transitional between desert and humid climates. Supports grasslands and dryland farming.'},
+      {label:'Highland',left:'Cold All Year · Thin Air · Snow. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-highland-climate\')">Zagros, Taurus, Elburz</span>',right:'Temperatures decrease with elevation. Supports coniferous forests and alpine grasses.'},
+    ],
+    vocab:['arid','Mediterranean','steppe','highland','desert'],
+    activity: null
+  },
+  'vegetation': {
+    emoji:'🌿', title:'Vegetation Types',
+    eye:'Plant life across Southwest Asia',
+    sub:'Southwest Asia possesses a variety of vegetation types because of its diverse landforms and climate zones — from desert scrub to Mediterranean forests and mountain woodlands.',
+    layout:'versus',
+    quiz:'vegetation',
+    grammar:{
+      passage:`<span class="tw" data-ans="1" onclick="tagWord(this)">Vegetation</span> <span class="tw" data-ans="2" onclick="tagWord(this)">varies</span> <span class="tw" data-ans="6" onclick="tagWord(this)">by</span> <span class="tw" data-ans="1" onclick="tagWord(this)">climate</span>. <span class="tw" data-ans="7" onclick="tagWord(this)">Desert</span> <span class="tw" data-ans="1" onclick="tagWord(this)">plants</span> <span class="tw" data-ans="2" onclick="tagWord(this)">grow</span> <span class="tw" data-ans="6" onclick="tagWord(this)">in</span> <span class="tw" data-ans="3" onclick="tagWord(this)">dry</span> <span class="tw" data-ans="1" onclick="tagWord(this)">areas</span>, <span class="tw" data-ans="5" onclick="tagWord(this)">while</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Mediterranean</span> <span class="tw" data-ans="1" onclick="tagWord(this)">forests</span> <span class="tw" data-ans="2" onclick="tagWord(this)">grow</span> <span class="tw" data-ans="6" onclick="tagWord(this)">on</span> <span class="tw" data-ans="3" onclick="tagWord(this)">coastal</span> <span class="tw" data-ans="1" onclick="tagWord(this)">hills</span>.`
+    },
+    left:{title:'Vegetation Type',col:'var(--seafoam)'},
+    right:{title:'Location & Features',col:'var(--coral)'},
+    rows:[
+      {label:'🌵 Desert Vegetation',left:'<span class="drill-trigger" onclick="openDrillOverlay(\'drill-desert-vegetation\')">Cacti, succulents, thorny shrubs</span>',right:'Rub\' al Khali, Syrian Desert, Dasht-e Lut, Dasht-e Kavir. Extreme aridity with drought-resistant plants.'},
+      {label:'🫒 Mediterranean Vegetation',left:'<span class="drill-trigger" onclick="openDrillOverlay(\'drill-mediterranean-vegetation\')">Olive, citrus, grape, evergreen shrubs</span>',right:'Coastal Turkey, Syria, Lebanon, Israel. Hot dry summers and mild wet winters.'},
+      {label:'🌾 Steppe Vegetation',left:'<span class="drill-trigger" onclick="openDrillOverlay(\'drill-steppe-vegetation\')">Short grasses, herbs, shrubs</span>',right:'Anatolian Plateau, Iranian Plateau. Semi-arid climate with moderate rainfall.'},
+      {label:'🌲 Montane Forest',left:'<span class="drill-trigger" onclick="openDrillOverlay(\'drill-montane-forest\')">Oak, pine, cedar, juniper</span>',right:'Zagros, Taurus, Elburz mountains. Moderate rainfall at higher elevations.'},
+    ],
+    vocab:['desert','Mediterranean','steppe','montane','succulent'],
+    activity: null
+  },
+  'resources': {
+    emoji:'⛏️', title:'Mineral Resources',
+    eye:'Southwest Asia\'s valuable natural resources',
+    sub:'Southwest Asia possesses the world\'s largest oil and natural gas reserves, along with significant mineral deposits — critical for modern economies.',
+    layout:'timeline',
+    quiz:'resources',
+    grammar:{
+      passage:`<span class="tw" data-ans="1" onclick="tagWord(this)">Resources</span> <span class="tw" data-ans="2" onclick="tagWord(this)">power</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Southwest</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Asia</span>’s <span class="tw" data-ans="1" onclick="tagWord(this)">economies</span>. <span class="tw" data-ans="1" onclick="tagWord(this)">Oil</span> <span class="tw" data-ans="5" onclick="tagWord(this)">and</span> <span class="tw" data-ans="1" onclick="tagWord(this)">gas</span> <span class="tw" data-ans="2" onclick="tagWord(this)">provide</span> <span class="tw" data-ans="3" onclick="tagWord(this)">clean</span> <span class="tw" data-ans="1" onclick="tagWord(this)">energy</span> <span class="tw" data-ans="6" onclick="tagWord(this)">for</span> <span class="tw" data-ans="1" onclick="tagWord(this)">homes</span>, <span class="tw" data-ans="5" onclick="tagWord(this)">but</span> <span class="tw" data-ans="1" onclick="tagWord(this)">minerals</span> <span class="tw" data-ans="2" onclick="tagWord(this)">drive</span> <span class="tw" data-ans="1" onclick="tagWord(this)">industry</span> <span class="tw" data-ans="6" onclick="tagWord(this)">in</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Turkey</span>.`
+    },
+    events:[
+      {era:'Oil & Natural Gas',icon:'🛢️',title:'World\'s Largest Reserves',body:'Saudi Arabia, Iran, Iraq, Kuwait, UAE, and Qatar contain over half of the world\'s proven oil reserves. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-oil\')">📖 Learn more</span>'},
+      {era:'Mineral Resources',icon:'⚒️',title:'Iron, Copper, Gold',body:'Turkey, Iran, and the Arabian Peninsula have significant deposits of iron ore, copper, zinc, lead, gold, and phosphate. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-minerals\')">📖 Learn more</span>'},
+      {era:'Water Resources',icon:'💧',title:'Rivers & Desalination',body:'The Tigris, Euphrates, Nile, and Jordan are lifelines for agriculture and drinking water. Desalination is increasingly important. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-water-resources\')">📖 Learn more</span>'},
+    ],
+    vocab:['oil','natural gas','minerals','desalination','reserves'],
+    activity: 'https://script.google.com/macros/s/AKfycbxq_BTTydwGk7PgesujRzNkEgzF7sMi8ZpTR9JBlHNPeSWAY_V7DHp6-pWAkOY48Ie-mA/exec'
+  },
+  'landuse': {
+    emoji:'🗺️', title:'Land Use',
+    eye:'How Southwest Asia uses its land',
+    sub:'Southwest Asia\'s land use includes oil extraction, agriculture, pastoralism, and rapid urban development — reflecting its geography and economy.',
+    layout:'timeline',
+    quiz:'landuse',
+    grammar:{
+      passage:`<span class="tw" data-ans="1" onclick="tagWord(this)">Land</span> <span class="tw" data-ans="1" onclick="tagWord(this)">use</span> <span class="tw" data-ans="2" onclick="tagWord(this)">varies</span> <span class="tw" data-ans="6" onclick="tagWord(this)">across</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Southwest</span> <span class="tw" data-ans="7" onclick="tagWord(this)">Asia</span>. <span class="tw" data-ans="1" onclick="tagWord(this)">Farming</span> <span class="tw" data-ans="2" onclick="tagWord(this)">covers</span> <span class="tw" data-ans="3" onclick="tagWord(this)">large</span> <span class="tw" data-ans="1" onclick="tagWord(this)">areas</span> <span class="tw" data-ans="5" onclick="tagWord(this)">and</span> <span class="tw" data-ans="1" onclick="tagWord(this)">cities</span> <span class="tw" data-ans="2" onclick="tagWord(this)">grow</span> <span class="tw" data-ans="6" onclick="tagWord(this)">along</span> <span class="tw" data-ans="3" onclick="tagWord(this)">coastal</span> <span class="tw" data-ans="1" onclick="tagWord(this)">plains</span>.`
+    },
+    events:[
+      {era:'Agricultural Land Use',icon:'🌾',title:'Farming the Land',body:'Wheat, barley, rice, and dates are staple crops. Olives, citrus, and cotton are major exports. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-agriculture\')">📖 Learn more</span>'},
+      {era:'Urban Development',icon:'🏙️',title:'Rapid Urbanization',body:'Istanbul, Tehran, Baghdad, Riyadh, Dubai, and Cairo — major urban centers growing rapidly due to oil wealth. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-urban\')">📖 Learn more</span>'},
+      {era:'Pastoralism & Nomadic Herding',icon:'🐪',title:'Bedouin & Kurdish Nomads',body:'Traditional nomadic herding of camels, sheep, and goats across the region. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-pastoralism\')">📖 Learn more</span>'},
+      {era:'Forestry & Conservation',icon:'🌳',title:'Protecting Wildlife',body:'National parks and reserves protect endangered species like the Arabian leopard and Arabian oryx. <span class="drill-trigger" onclick="openDrillOverlay(\'drill-forestry\')">📖 Learn more</span>'},
+    ],
+    vocab:['agriculture','urban','pastoralism','conservation','nomadic'],
+    activity: 'https://script.google.com/macros/s/AKfycbwuBnmw3yjNTuNKC0yDhvSgUldRgbMrIcPpYd5cmPI66CTtlHdAPLNPvFK1rVzwVmhbzg/exec'
+  }
+};
+
+const VOCAB = {
+  'landforms':[
+    {w:'Zagros',p:'zah-grohs',pos:'noun',d:'A long mountain range in southwestern Iran, rich in oil and natural gas.',e:'The Zagros Mountains contain some of the world\'s largest oil reserves.'},
+    {w:'Taurus',p:'tawr-uhs',pos:'noun',d:'A mountain range in southern Turkey, source of the Tigris and Euphrates rivers.',e:'The Taurus Mountains run parallel to the Mediterranean coast.'},
+    {w:'Plateau',p:'pla-toh',pos:'noun',d:'A large, flat area of land that is higher than the surrounding land.',e:'The Anatolian Plateau is a large plateau in central Turkey.'},
+    {w:'Peninsula',p:'puh-nin-suh-luh',pos:'noun',d:'A piece of land almost surrounded by water.',e:'The Arabian Peninsula is bounded by the Red Sea and Persian Gulf.'},
+    {w:'Oil Reserves',p:'oyl ri-zurvz',pos:'noun',d:'Amounts of oil that are known to exist underground and can be extracted.',e:'Southwest Asia has the world\'s largest oil reserves.'}
+  ],
+  'plains':[
+    {w:'Tigris',p:'ty-gris',pos:'noun',d:'A major river in Southwest Asia, flowing through Iraq to the Persian Gulf.',e:'The Tigris River flows through the heart of Mesopotamia.'},
+    {w:'Euphrates',p:'yoo-fray-teez',pos:'noun',d:'A major river in Southwest Asia, flowing through Turkey and Iraq.',e:'The Euphrates River is one of the two rivers of Mesopotamia.'},
+    {w:'Nile',p:'nyl',pos:'noun',d:'The longest river in the world, flowing north through Egypt.',e:'The Nile River supported ancient Egyptian civilization.'},
+    {w:'Jordan',p:'jor-dun',pos:'noun',d:'A major river in the Middle East, flowing to the Dead Sea.',e:'The Jordan River is sacred to Judaism, Christianity, and Islam.'},
+    {w:'Mesopotamia',p:'mes-uh-puh-tay-mee-uh',pos:'noun',d:'The ancient region between the Tigris and Euphrates rivers.',e:'Mesopotamia means "Land Between the Rivers."'}
+  ],
+  'deserts':[
+    {w:'Rub\' al Khali',p:'roob al kah-lee',pos:'noun',d:'The largest continuous sand desert in the world, in the Arabian Peninsula.',e:'The Rub\' al Khali is known as the "Empty Quarter."'},
+    {w:'Desert',p:'dez-ert',pos:'noun',d:'A very dry area with little rainfall and few plants.',e:'The Syrian Desert spans parts of Syria, Jordan, and Iraq.'},
+    {w:'Arid',p:'ar-id',pos:'adj',d:'Very dry with little rainfall.',e:'Southwest Asia has an arid climate with very little rain.'},
+    {w:'Salt Flat',p:'sawlt flat',pos:'noun',d:'A flat area of ground covered with salt and other minerals.',e:'The Dasht-e Kavir has vast salt flats.'},
+    {w:'Empty Quarter',p:'emp-tee kwor-ter',pos:'noun',d:'Another name for the Rub\' al Khali desert.',e:'The Empty Quarter is one of the driest places on Earth.'}
+  ],
+  'coasts':[
+    {w:'Persian Gulf',p:'pur-zhun gulf',pos:'noun',d:'A shallow marginal sea between the Arabian Peninsula and Iran.',e:'The Persian Gulf is vital for global oil trade.'},
+    {w:'Red Sea',p:'red see',pos:'noun',d:'A seawater inlet of the Indian Ocean, between Africa and the Arabian Peninsula.',e:'The Red Sea is connected to the Mediterranean by the Suez Canal.'},
+    {w:'Arabian Sea',p:'uh-ray-bee-un see',pos:'noun',d:'A region of the northern Indian Ocean, bounded by the Arabian Peninsula.',e:'The Arabian Sea is an important shipping route.'},
+    {w:'Mediterranean',p:'med-i-tuh-ray-nee-un',pos:'noun',d:'The sea connected to the Atlantic Ocean, surrounded by Europe, Africa, and Asia.',e:'The Mediterranean coast includes Turkey, Syria, and Lebanon.'},
+    {w:'Strait of Hormuz',p:'strayt of hor-mooz',pos:'noun',d:'A narrow waterway connecting the Persian Gulf to the Gulf of Oman.',e:'The Strait of Hormuz is a critical chokepoint for global oil shipments.'}
+  ],
+  'climate':[
+    {w:'Arid',p:'ar-id',pos:'adj',d:'Very dry with little rainfall.',e:'Desert areas have an arid climate with very little rain.'},
+    {w:'Mediterranean',p:'med-i-tuh-ray-nee-un',pos:'adj',d:'Relating to the Mediterranean Sea and its climate.',e:'The Mediterranean climate has hot dry summers and mild wet winters.'},
+    {w:'Steppe',p:'step',pos:'noun',d:'A large area of flat, dry grassland with few trees.',e:'The Anatolian Plateau has a semi-arid steppe climate.'},
+    {w:'Highland',p:'hye-land',pos:'noun',d:'An area of high or mountainous land.',e:'The Zagros Mountains have a highland climate.'},
+    {w:'Desert',p:'dez-ert',pos:'noun',d:'A very dry area with little rainfall and few plants.',e:'The Rub\' al Khali is a vast desert in the Arabian Peninsula.'}
+  ],
+  'vegetation':[
+    {w:'Desert',p:'dez-ert',pos:'noun',d:'A very dry area with little rainfall and few plants.',e:'Desert vegetation is found in the Rub\' al Khali.'},
+    {w:'Mediterranean',p:'med-i-tuh-ray-nee-un',pos:'adj',d:'Relating to the Mediterranean Sea and its vegetation.',e:'Mediterranean vegetation includes olive trees and citrus.'},
+    {w:'Steppe',p:'step',pos:'noun',d:'A large area of flat, dry grassland with few trees.',e:'Steppe vegetation is found on the Anatolian Plateau.'},
+    {w:'Montane',p:'mon-tayn',pos:'adj',d:'Relating to mountains.',e:'Montane forests grow in the Zagros Mountains.'},
+    {w:'Succulent',p:'suhk-yuh-lunt',pos:'noun',d:'A plant that stores water in its leaves or stems.',e:'Succulents like cacti grow in desert regions.'}
+  ],
+  'resources':[
+    {w:'Oil',p:'oyl',pos:'noun',d:'A liquid fossil fuel used for energy and manufacturing.',e:'Southwest Asia has the world\'s largest oil reserves.'},
+    {w:'Natural Gas',p:'nach-er-uhl gas',pos:'noun',d:'A fossil fuel used for cooking, heating, and electricity.',e:'Qatar is a major exporter of natural gas.'},
+    {w:'Minerals',p:'min-er-uls',pos:'noun',d:'Substances found in the earth that are used for industry.',e:'Turkey has significant deposits of iron ore and copper.'},
+    {w:'Desalination',p:'dee-sal-uh-nay-shun',pos:'noun',d:'The process of removing salt from seawater to make it drinkable.',e:'Desalination is increasingly important in Southwest Asia.'},
+    {w:'Reserves',p:'ri-zurvz',pos:'noun',d:'Amounts of resources that are known to exist and can be extracted.',e:'The region has vast oil and natural gas reserves.'}
+  ],
+  'landuse':[
+    {w:'Agriculture',p:'ag-ri-kul-chur',pos:'noun',d:'The practice of farming and growing crops.',e:'Agriculture is practiced in the river valleys of Southwest Asia.'},
+    {w:'Urban',p:'ur-bun',pos:'adj',d:'Relating to cities and towns.',e:'Urban areas in Southwest Asia are growing rapidly.'},
+    {w:'Pastoralism',p:'pas-ter-ul-izm',pos:'noun',d:'The practice of herding animals for food and other products.',e:'Pastoralism is practiced by Bedouin nomads in the desert.'},
+    {w:'Conservation',p:'kon-ser-vay-shun',pos:'noun',d:'The protection of natural resources and wildlife.',e:'Conservation efforts protect the Arabian leopard.'},
+    {w:'Nomadic',p:'noh-mad-ik',pos:'adj',d:'Relating to people who move from place to place.',e:'Nomadic herders move their animals in search of pasture.'}
+  ]
+};
+
+const QUIZZES = {
+  'landforms':{title:'Mountains & Plateaus 🏔️',qs:[
+    {type:'id',q:'What long mountain range in southwestern Iran is rich in oil and natural gas?',a:'zagros mountains',alt:['zagros'],e:'The Zagros Mountains contain some of the world\'s largest oil reserves.'},
+    {type:'id',q:'What mountain range in southern Turkey is the source of the Tigris and Euphrates rivers?',a:'taurus mountains',alt:['taurus'],e:'The Taurus Mountains are the source of the Tigris and Euphrates rivers.'},
+    {type:'id',q:'What large plateau covers most of central Turkey?',a:'anatolian plateau',alt:['anatolian'],e:'The Anatolian Plateau is a large plateau in central Turkey.'},
+    {type:'id',q:'What large peninsula in Southwest Asia contains some of the world\'s largest oil reserves?',a:'arabian peninsula',alt:['arabian'],e:'The Arabian Peninsula contains some of the world\'s largest oil reserves.'},
+    {type:'id',q:'What mountain range in northern Iran separates the Caspian Sea from the Iranian Plateau?',a:'elburz mountains',alt:['elburz'],e:'The Elburz Mountains separate the Caspian Sea from the Iranian Plateau.'},
+    {type:'mc',q:'What is the highest peak in Iran?',opts:['Mount Ararat','Mount Damavand','Mount Elbrus','Mount Everest'],c:1,e:'Mount Damavand is the highest peak in Iran at 5,610 meters.'},
+    {type:'mc',q:'What is the average elevation of the Anatolian Plateau?',opts:['About 500 meters','About 1,000 meters','About 2,000 meters','About 3,000 meters'],c:1,e:'The Anatolian Plateau averages about 1,000 meters in elevation.'},
+    {type:'mc',q:'Which mountain range runs parallel to the Mediterranean coast?',opts:['Zagros','Taurus','Elburz','Hindu Kush'],c:1,e:'The Taurus Mountains run parallel to the Mediterranean coast.'},
+    {type:'tf',q:'The Zagros Mountains are located in southwestern Iran.',a:true,e:'Correct — the Zagros Mountains are in southwestern Iran.'},
+    {type:'tf',q:'The Arabian Peninsula is the smallest peninsula in the world.',a:false,e:'False — the Arabian Peninsula is one of the largest peninsulas in the world.'},
+    {type:'tf',q:'The Elburz Mountains are in northern Iran.',a:true,e:'Correct — the Elburz Mountains are in northern Iran.'},
+    {type:'tf',q:'The Taurus Mountains are located in Egypt.',a:false,e:'False — the Taurus Mountains are in southern Turkey.'},
+    {type:'tf',q:'The Iranian Plateau covers most of Iran, Afghanistan, and Pakistan.',a:true,e:'Correct — the Iranian Plateau covers most of Iran, Afghanistan, and Pakistan.'},
+    {type:'tf',q:'Mount Damavand is a dormant volcano.',a:true,e:'Correct — Mount Damavand is a dormant volcano.'},
+    {type:'tf',q:'The Anatolian Plateau is known for rice farming.',a:false,e:'False — the Anatolian Plateau is known for wheat and livestock farming.'},
+  ]},
+  'plains':{title:'Plains & River Valleys 🌾',qs:[
+    {type:'id',q:'What ancient region lies between the Tigris and Euphrates rivers?',a:'mesopotamia',e:'Mesopotamia means "Land Between the Rivers."'},
+    {type:'id',q:'What is the longest river in the world, flowing through Egypt?',a:'nile river',alt:['nile'],e:'The Nile River is the longest river in the world.'},
+    {type:'id',q:'What major river in the Middle East flows to the Dead Sea?',a:'jordan river',alt:['jordan'],e:'The Jordan River flows to the Dead Sea.'},
+    {type:'id',q:'What river flows through Iraq to the Persian Gulf?',a:'tigris river',alt:['tigris'],e:'The Tigris River flows through Iraq to the Persian Gulf.'},
+    {type:'id',q:'What river flows through Turkey and Iraq and is one of the two rivers of Mesopotamia?',a:'euphrates river',alt:['euphrates'],e:'The Euphrates River is one of the two rivers of Mesopotamia.'},
+    {type:'mc',q:'What does "Mesopotamia" mean?',opts:['Land of Rivers','Land Between the Rivers','Land of Deserts','Land of Mountains'],c:1,e:'Mesopotamia means "Land Between the Rivers."'},
+    {type:'mc',q:'What ancient civilization was centered on the Nile River?',opts:['Sumerian','Babylonian','Egyptian','Assyrian'],c:2,e:'Ancient Egyptian civilization was centered on the Nile River.'},
+    {type:'mc',q:'What dam was built on the Nile River in the 1960s?',opts:['Hoover Dam','Aswan High Dam','Three Gorges Dam','Bhakra Dam'],c:1,e:'The Aswan High Dam was built on the Nile River in the 1960s.'},
+    {type:'tf',q:'The Tigris and Euphrates rivers flow through Iraq.',a:true,e:'Correct — the Tigris and Euphrates rivers flow through Iraq.'},
+    {type:'tf',q:'The Nile River flows south through Egypt.',a:false,e:'False — the Nile River flows north through Egypt.'},
+    {type:'tf',q:'The Jordan River is sacred to Judaism, Christianity, and Islam.',a:true,e:'Correct — the Jordan River is sacred to all three religions.'},
+    {type:'tf',q:'Mesopotamia was home to ancient Sumer and Babylon.',a:true,e:'Correct — Mesopotamia was home to Sumer, Babylon, and Assyria.'},
+    {type:'tf',q:'The Euphrates River is shorter than the Tigris River.',a:false,e:'False — the Euphrates River is longer than the Tigris River.'},
+    {type:'tf',q:'The Nile River is the longest river in the world.',a:true,e:'Correct — the Nile River is the longest river in the world.'},
+    {type:'tf',q:'The Jordan River flows into the Persian Gulf.',a:false,e:'False — the Jordan River flows into the Dead Sea.'},
+  ]},
+  'deserts':{title:'Deserts & Basins 🏜️',qs:[
+    {type:'id',q:'What is the largest continuous sand desert in the world?',a:'rub al khali',alt:['empty quarter','rub al khali'],e:'The Rub\' al Khali is also known as the Empty Quarter.'},
+    {type:'id',q:'What vast desert spans parts of Syria, Jordan, Iraq, and Saudi Arabia?',a:'syrian desert',alt:['syrian'],e:'The Syrian Desert spans parts of Syria, Jordan, Iraq, and Saudi Arabia.'},
+    {type:'id',q:'What salt desert in southeastern Iran is one of the hottest places on Earth?',a:'dasht-e lut',alt:['dasht e lut','lut desert'],e:'The Dasht-e Lut recorded surface temperatures of 70.7°C.'},
+    {type:'id',q:'What salt desert in central Iran is one of the driest regions in the world?',a:'dasht-e kavir',alt:['dasht e kavir','kavir desert'],e:'The Dasht-e Kavir has vast salt flats and salt marshes.'},
+    {type:'id',q:'What is another name for the Rub\' al Khali?',a:'empty quarter',alt:['empty quarter'],e:'The Rub\' al Khali is also known as the Empty Quarter.'},
+    {type:'mc',q:'What is the largest continuous sand desert in the world?',opts:['Sahara','Gobi','Rub\' al Khali','Thar'],c:2,e:'The Rub\' al Khali is the largest continuous sand desert in the world.'},
+    {type:'mc',q:'What is the highest recorded surface temperature on Earth, measured in the Dasht-e Lut?',opts:['50.7°C','60.7°C','70.7°C','80.7°C'],c:2,e:'The Dasht-e Lut recorded a surface temperature of 70.7°C.'},
+    {type:'mc',q:'What ancient city is located in the Syrian Desert?',opts:['Petra','Palmyra','Babylon','Persepolis'],c:1,e:'Palmyra is an ancient city in the Syrian Desert.'},
+    {type:'tf',q:'The Rub\' al Khali is located in the Arabian Peninsula.',a:true,e:'Correct — the Rub\' al Khali is in the Arabian Peninsula.'},
+    {type:'tf',q:'The Dasht-e Lut is a cold desert.',a:false,e:'False — the Dasht-e Lut is one of the hottest places on Earth.'},
+    {type:'tf',q:'The Syrian Desert spans parts of Syria, Jordan, Iraq, and Saudi Arabia.',a:true,e:'Correct — the Syrian Desert spans these countries.'},
+    {type:'tf',q:'The Dasht-e Kavir is located in western Iran.',a:false,e:'False — the Dasht-e Kavir is in central Iran.'},
+    {type:'tf',q:'The Rub\' al Khali has some of the world\'s largest oil fields beneath its sands.',a:true,e:'Correct — some of the world\'s largest oil fields lie beneath the Rub\' al Khali.'},
+    {type:'tf',q:'The Syrian Desert is home to the ancient city of Petra.',a:false,e:'False — Petra is in Jordan, not the Syrian Desert.'},
+    {type:'tf',q:'The Dasht-e Lut contains giant sand castles carved by wind erosion.',a:true,e:'Correct — the Dasht-e Lut contains yardangs (sand castles) carved by wind.'},
+  ]},
+  'coasts':{title:'Coasts & Islands 🌊',qs:[
+    {type:'id',q:'What shallow marginal sea between the Arabian Peninsula and Iran is vital for global oil trade?',a:'persian gulf',alt:['persian gulf'],e:'The Persian Gulf is vital for global oil trade.'},
+    {type:'id',q:'What seawater inlet of the Indian Ocean lies between Africa and the Arabian Peninsula?',a:'red sea',alt:['red sea'],e:'The Red Sea lies between Africa and the Arabian Peninsula.'},
+    {type:'id',q:'What region of the northern Indian Ocean is bounded by the Arabian Peninsula, Iran, Pakistan, and India?',a:'arabian sea',alt:['arabian sea'],e:'The Arabian Sea is bounded by the Arabian Peninsula, Iran, Pakistan, and India.'},
+    {type:'id',q:'What narrow waterway connects the Persian Gulf to the Gulf of Oman?',a:'strait of hormuz',alt:['hormuz'],e:'The Strait of Hormuz is a critical chokepoint for global oil shipments.'},
+    {type:'id',q:'What sea is connected to the Red Sea by the Suez Canal?',a:'mediterranean sea',alt:['mediterranean'],e:'The Mediterranean Sea is connected to the Red Sea by the Suez Canal.'},
+    {type:'mc',q:'What is the eastern Mediterranean coast known as?',opts:['The Levant','The Maghreb','The Sahel','The Fertile Crescent'],c:0,e:'The eastern Mediterranean coast is known as the Levant.'},
+    {type:'mc',q:'What canal connects the Red Sea to the Mediterranean?',opts:['Panama Canal','Suez Canal','Kiel Canal','Erie Canal'],c:1,e:'The Suez Canal connects the Red Sea to the Mediterranean.'},
+    {type:'mc',q:'What strait is a critical chokepoint for global oil shipments?',opts:['Strait of Malacca','Strait of Hormuz','Strait of Gibraltar','Bosphorus Strait'],c:1,e:'The Strait of Hormuz is a critical chokepoint for global oil shipments.'},
+    {type:'tf',q:'The Persian Gulf is vital for global oil trade.',a:true,e:'Correct — the Persian Gulf is vital for global oil trade.'},
+    {type:'tf',q:'The Red Sea is connected to the Mediterranean by the Suez Canal.',a:true,e:'Correct — the Suez Canal connects the Red Sea to the Mediterranean.'},
+    {type:'tf',q:'The Arabian Sea is a region of the southern Atlantic Ocean.',a:false,e:'False — the Arabian Sea is a region of the northern Indian Ocean.'},
+    {type:'tf',q:'The Mediterranean coast includes Turkey, Syria, and Lebanon.',a:true,e:'Correct — the Mediterranean coast includes these countries.'},
+    {type:'tf',q:'The Strait of Hormuz connects the Red Sea to the Mediterranean.',a:false,e:'False — the Strait of Hormuz connects the Persian Gulf to the Gulf of Oman.'},
+    {type:'tf',q:'The Suez Canal is one of the world\'s busiest shipping lanes.',a:true,e:'Correct — the Suez Canal is one of the world\'s busiest shipping lanes.'},
+    {type:'tf',q:'The Red Sea has some of the world\'s most pristine coral reefs.',a:true,e:'Correct — the Red Sea has some of the world\'s most pristine coral reefs.'},
+  ]},
+  'climate':{title:'Climate Zones 🌡️',qs:[
+    {type:'id',q:'What climate zone has very hot days, cool nights, and extremely low rainfall?',a:'desert',alt:['arid'],e:'Desert (arid) climate has very hot days and extremely low rainfall.'},
+    {type:'id',q:'What climate zone has hot dry summers and mild wet winters?',a:'mediterranean',e:'Mediterranean climate has hot dry summers and mild wet winters.'},
+    {type:'id',q:'What climate zone has hot summers, cold winters, and moderate rainfall?',a:'steppe',alt:['semi-arid'],e:'Steppe climate has hot summers, cold winters, and moderate rainfall.'},
+    {type:'id',q:'What climate zone has cold temperatures and thin air at high elevations?',a:'highland',e:'Highland climate has cold temperatures and thin air at high elevations.'},
+    {type:'id',q:'What is the most common climate type in Southwest Asia?',a:'desert',alt:['arid'],e:'Desert (arid) is the most common climate type in Southwest Asia.'},
+    {type:'mc',q:'What climate is found in the Rub\' al Khali?',opts:['Mediterranean','Desert','Steppe','Highland'],c:1,e:'The Rub\' al Khali has a desert climate.'},
+    {type:'mc',q:'What climate is found on the Mediterranean coast?',opts:['Desert','Mediterranean','Steppe','Highland'],c:1,e:'The Mediterranean coast has a Mediterranean climate.'},
+    {type:'mc',q:'What climate is found on the Anatolian Plateau?',opts:['Desert','Mediterranean','Steppe','Highland'],c:2,e:'The Anatolian Plateau has a semi-arid steppe climate.'},
+    {type:'tf',q:'Southwest Asia has a variety of climate types.',a:true,e:'Correct — Southwest Asia has a variety of climate types.'},
+    {type:'tf',q:'The Zagros Mountains have a desert climate.',a:false,e:'False — the Zagros Mountains have a highland climate.'},
+    {type:'tf',q:'The Mediterranean climate supports olives, citrus, and grapes.',a:true,e:'Correct — the Mediterranean climate supports these crops.'},
+    {type:'tf',q:'The Rub\' al Khali receives high rainfall.',a:false,e:'False — the Rub\' al Khali is extremely dry.'},
+    {type:'tf',q:'The steppe climate is transitional between desert and humid climates.',a:true,e:'Correct — the steppe climate is transitional.'},
+    {type:'tf',q:'Highland climates have warmer temperatures than desert climates.',a:false,e:'False — highland climates have colder temperatures due to elevation.'},
+    {type:'tf',q:'The Dasht-e Lut has a desert climate.',a:true,e:'Correct — the Dasht-e Lut has a desert climate.'},
+  ]},
+  'vegetation':{title:'Vegetation Types 🌿',qs:[
+    {type:'id',q:'What vegetation type is found in the Rub\' al Khali with cacti and thorny shrubs?',a:'desert',e:'Desert vegetation includes cacti and thorny shrubs.'},
+    {type:'id',q:'What vegetation type is found on the Mediterranean coast with olive trees and citrus?',a:'mediterranean',e:'Mediterranean vegetation includes olive trees and citrus.'},
+    {type:'id',q:'What vegetation type is found on the Anatolian Plateau with short grasses?',a:'steppe',e:'Steppe vegetation includes short grasses and herbs.'},
+    {type:'id',q:'What vegetation type is found in the Zagros Mountains with oak and pine trees?',a:'montane forest',alt:['montane'],e:'Montane forests include oak, pine, cedar, and juniper trees.'},
+    {type:'id',q:'What type of plant stores water in its leaves or stems?',a:'succulent',e:'Succulents like cacti store water in their leaves or stems.'},
+    {type:'mc',q:'What vegetation type is found in the Syrian Desert?',opts:['Mediterranean','Desert','Steppe','Montane'],c:1,e:'The Syrian Desert has desert vegetation.'},
+    {type:'mc',q:'What trees are found in Mediterranean vegetation?',opts:['Oak and pine','Olive and citrus','Cacti and succulents','Grasses and herbs'],c:1,e:'Olive and citrus trees are found in Mediterranean vegetation.'},
+    {type:'mc',q:'What vegetation type is found in the Elburz Mountains?',opts:['Desert','Mediterranean','Steppe','Montane forest'],c:3,e:'The Elburz Mountains have montane forest vegetation.'},
+    {type:'tf',q:'Desert vegetation is adapted to extreme aridity.',a:true,e:'Correct — desert vegetation is adapted to extreme aridity.'},
+    {type:'tf',q:'Mediterranean vegetation includes cacti and succulents.',a:false,e:'False — cacti and succulents are desert vegetation.'},
+    {type:'tf',q:'Steppe vegetation includes short grasses and herbs.',a:true,e:'Correct — steppe vegetation includes short grasses and herbs.'},
+    {type:'tf',q:'Montane forests grow in the Rub\' al Khali.',a:false,e:'False — montane forests grow in mountain regions like the Zagros.'},
+    {type:'tf',q:'The Mediterranean climate supports olive trees.',a:true,e:'Correct — the Mediterranean climate supports olive trees.'},
+    {type:'tf',q:'Steppe vegetation is found in the Dasht-e Lut.',a:false,e:'False — the Dasht-e Lut has desert vegetation.'},
+    {type:'tf',q:'Montane forests are important for timber and watershed protection.',a:true,e:'Correct — montane forests are important for timber and watershed protection.'},
+  ]},
+  'resources':{title:'Mineral Resources ⛏️',qs:[
+    {type:'id',q:'What fossil fuel is found in the largest reserves in Southwest Asia?',a:'oil',alt:['petroleum'],e:'Southwest Asia has the world\'s largest oil reserves.'},
+    {type:'id',q:'What fossil fuel is used for cooking, heating, and electricity and is abundant in Qatar?',a:'natural gas',alt:['gas'],e:'Qatar is a major exporter of natural gas.'},
+    {type:'id',q:'What process removes salt from seawater to make it drinkable?',a:'desalination',e:'Desalination is increasingly important in Southwest Asia.'},
+    {type:'id',q:'What country has significant deposits of iron ore and copper?',a:'turkey',alt:['turkey'],e:'Turkey has significant deposits of iron ore and copper.'},
+    {type:'id',q:'What is the term for amounts of resources that are known to exist and can be extracted?',a:'reserves',e:'The region has vast oil and natural gas reserves.'},
+    {type:'mc',q:'What countries contain over half of the world\'s proven oil reserves?',opts:['Saudi Arabia, Iran, Iraq','Turkey, Egypt, Israel','Jordan, Lebanon, Syria','Yemen, Oman, Bahrain'],c:0,e:'Saudi Arabia, Iran, and Iraq contain over half of the world\'s proven oil reserves.'},
+    {type:'mc',q:'What mineral is found in significant deposits in Turkey?',opts:['Gold','Iron ore','Copper','All of the above'],c:3,e:'Turkey has significant deposits of iron ore, copper, gold, and other minerals.'},
+    {type:'mc',q:'What is the process of removing salt from seawater?',opts:['Irrigation','Desalination','Filtration','Distillation'],c:1,e:'Desalination removes salt from seawater.'},
+    {type:'tf',q:'Southwest Asia has the world\'s largest oil reserves.',a:true,e:'Correct — Southwest Asia has the world\'s largest oil reserves.'},
+    {type:'tf',q:'Qatar is a major exporter of natural gas.',a:true,e:'Correct — Qatar is a major exporter of natural gas.'},
+    {type:'tf',q:'Water is abundant in Southwest Asia.',a:false,e:'False — water is scarce in Southwest Asia.'},
+    {type:'tf',q:'Desalination is increasingly important in Southwest Asia.',a:true,e:'Correct — desalination is increasingly important.'},
+    {type:'tf',q:'Turkey has no significant mineral deposits.',a:false,e:'False — Turkey has significant deposits of iron ore, copper, and gold.'},
+    {type:'tf',q:'Oil exports drive the economies of many Southwest Asian countries.',a:true,e:'Correct — oil exports drive the economies of many countries in the region.'},
+    {type:'tf',q:'The region has vast natural gas reserves.',a:true,e:'Correct — the region has vast natural gas reserves.'},
+  ]},
+  'landuse':{title:'Land Use 🗺️',qs:[
+    {type:'id',q:'What is the practice of farming in river valleys called?',a:'agriculture',e:'Agriculture is the main land use in river valleys.'},
+    {type:'id',q:'What is a city with a population over 10 million called?',a:'megacity',e:'A megacity has a population over 10 million.'},
+    {type:'id',q:'What is the practice of herding animals for food and other products?',a:'pastoralism',e:'Pastoralism is practiced by Bedouin nomads in the desert.'},
+    {type:'id',q:'What term describes the protection of natural resources and wildlife?',a:'conservation',e:'Conservation protects natural resources and wildlife.'},
+    {type:'id',q:'What term describes people who move from place to place?',a:'nomadic',e:'Nomadic herders move their animals in search of pasture.'},
+    {type:'mc',q:'What are staple crops in Southwest Asia?',opts:['Rice and corn','Wheat and barley','Potatoes and tomatoes','Bananas and mangoes'],c:1,e:'Wheat and barley are staple crops in Southwest Asia.'},
+    {type:'mc',q:'What are major exports from Southwest Asia?',opts:['Olives and citrus','Cotton and tobacco','Dates and figs','All of the above'],c:3,e:'Olives, citrus, cotton, tobacco, and dates are major exports.'},
+    {type:'mc',q:'What animal is traditionally herded by Bedouin nomads?',opts:['Cattle','Camels','Horses','Llamas'],c:1,e:'Camels are traditionally herded by Bedouin nomads.'},
+    {type:'tf',q:'Urbanization is increasing rapidly in Southwest Asia.',a:true,e:'Correct — urbanization is increasing rapidly in Southwest Asia.'},
+    {type:'tf',q:'Pastoralism is practiced by Bedouin nomads.',a:true,e:'Correct — pastoralism is practiced by Bedouin nomads.'},
+    {type:'tf',q:'Conservation efforts protect the Arabian leopard.',a:true,e:'Correct — conservation efforts protect the Arabian leopard.'},
+    {type:'tf',q:'Forests cover most of Southwest Asia.',a:false,e:'False — forests cover a small percentage of Southwest Asia.'},
+    {type:'tf',q:'Oil extraction is a major land use in Southwest Asia.',a:true,e:'Correct — oil extraction is a major land use in Southwest Asia.'},
+    {type:'tf',q:'Agriculture is not practiced in Southwest Asia.',a:false,e:'False — agriculture is practiced in river valleys and oases.'},
+    {type:'tf',q:'Water scarcity is a major challenge for agriculture in Southwest Asia.',a:true,e:'Correct — water scarcity is a major challenge for agriculture.'},
+  ]}
+};
+
+/* ============================================================
+   VIDEO IDS — section-specific YouTube videos
+   ============================================================ */
+const VIDEO_IDS = {
+  'landforms': 'zrLYeCvgw9U',   // Mountains & Plateaus
+  'plains': '0BN7d4nX5-Y',     // Rivers & Plains
+  'default': 'dEwW1r_HcyU'     // Default intro video
+};
+
+/* ============================================================
+   RENDER & HELPERS
+   ============================================================ */
+const S = { sidebarOpen: false, vocabOpen: false, done: new Set() };
+let QS = { key:'', cur:0, score:0, answered:false, done:false, data:null };
+
+/* ============================================================
+   SESSION / LOGIN — gates the app and tags every Sheets row
+   ============================================================ */
+const SESSION_KEY = 'southwest_asia_session_v1';
+let SESSION = { studentId:'', fullName:'', section:'' };
+let currentSecKey = 'landforms';
+
+function _digitsOnly(s){ return (s||'').replace(/\D/g,''); }
+
+function initSession(){
+  document.getElementById('lg-id').addEventListener('input', e=>{ e.target.value = _digitsOnly(e.target.value).slice(0,5); });
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch(err){ saved = null; }
+  if (saved && saved.studentId && saved.fullName && saved.section) {
+    SESSION = saved;
+    enterApp();
+  } else {
+    document.getElementById('login-gate').classList.remove('hidden');
+    lockScroll();
+  }
+}
+
+function _setLgErr(field, msg){
+  const inp = document.getElementById('lg-'+field);
+  const err = document.getElementById('lg-'+field+'-err');
+  if (msg) { inp.classList.add('err'); err.textContent = msg; err.classList.add('show'); }
+  else { inp.classList.remove('err'); err.textContent=''; err.classList.remove('show'); }
+}
+
+function handleLoginSubmit(evt){
+  evt.preventDefault();
+  const id = document.getElementById('lg-id').value.trim();
+  const name = document.getElementById('lg-name').value.trim();
+  const section = document.getElementById('lg-section').value;
+  let ok = true;
+  if (!/^\d{5}$/.test(id)) { _setLgErr('id','Student ID must be exactly 5 digits.'); ok=false; } else _setLgErr('id','');
+  if (!name) { _setLgErr('name','Please enter your full name.'); ok=false; } else _setLgErr('name','');
+  if (!section) { _setLgErr('section','Please select your section.'); ok=false; } else _setLgErr('section','');
+  if (!ok) return false;
+
+  const btn = document.getElementById('lg-submit-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  SESSION = { studentId:id, fullName:name, section:section };
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION)); } catch(err){}
+  setTimeout(()=>{ enterApp(); btn.disabled=false; btn.textContent='Enter the Lesson →'; }, 150);
+  return false;
+}
+
+function enterApp(){
+  document.getElementById('login-gate').classList.add('hidden');
+  unlockScroll();
+  const badge = document.getElementById('lg-userbadge');
+  badge.style.display = 'flex';
+  document.getElementById('lg-userbadge-text').textContent = SESSION.fullName + ' (' + SESSION.section + ')';
+}
+
+/* ============================================================
+   SWITCH USER — polished custom confirmation dialog
+   ============================================================ */
+function _injectSwitchUserStyles(){
+  if (document.getElementById('su-modal-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'su-modal-styles';
+  style.textContent = `
+    #su-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .28s cubic-bezier(.4,0,.2,1);
+    }
+    #su-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    #su-modal-card {
+      background: linear-gradient(160deg, #1C1712 0%, #14100C 100%);
+      border: 1px solid #4A3D2E;
+      border-radius: 16px;
+      box-shadow: 0 8px 48px rgba(0,0,0,.7), 0 0 0 1px rgba(212,168,75,.12);
+      width: 100%;
+      max-width: 380px;
+      padding: 32px 28px 24px;
+      text-align: center;
+      transform: scale(.94) translateY(10px);
+      transition: transform .28s cubic-bezier(.4,0,.2,1);
+    }
+    #su-modal-backdrop.open #su-modal-card {
+      transform: scale(1) translateY(0);
+    }
+    #su-modal-icon {
+      font-size: 2.8rem;
+      line-height: 1;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 2px 8px rgba(196,92,58,.4));
+    }
+    #su-modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #F0C96E;
+      letter-spacing: .03em;
+      margin-bottom: 10px;
+    }
+    #su-modal-who {
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      color: #9A8A72;
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    #su-modal-who strong {
+      color: #D8C9A8;
+      font-weight: 800;
+    }
+    #su-modal-note {
+      font-family: 'Nunito', sans-serif;
+      font-size: .8rem;
+      color: #6A5A48;
+      background: rgba(12,10,8,.45);
+      border: 1px solid #4A3D2E;
+      border-radius: 8px;
+      padding: 9px 12px;
+      margin: 16px 0 22px;
+      line-height: 1.55;
+    }
+    #su-modal-note span {
+      color: #E87A55;
+      font-weight: 700;
+    }
+    #su-modal-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    #su-btn-keep {
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 800;
+      background: #1C1712;
+      color: #9A8A72;
+      border: 1px solid #4A3D2E;
+      border-radius: 8px;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: background .22s, border-color .22s, color .22s;
+      flex: 1;
+    }
+    #su-btn-keep:hover {
+      background: #2A231A;
+      border-color: #C4A35A;
+      color: #D8C9A8;
+    }
+    #su-btn-switch {
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #C45C3A, #D4A84B);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: filter .22s, transform .16s;
+      box-shadow: 0 3px 14px rgba(196,92,58,.35);
+      flex: 1;
+    }
+    #su-btn-switch:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+    #su-btn-switch:active {
+      transform: translateY(0);
+      filter: brightness(.95);
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function _buildSwitchUserModal(){
+  if (document.getElementById('su-modal-backdrop')) return;
+  const backdrop = document.createElement('div');
+  backdrop.id = 'su-modal-backdrop';
+  backdrop.setAttribute('role', 'dialog');
+  backdrop.setAttribute('aria-modal', 'true');
+  backdrop.setAttribute('aria-labelledby', 'su-modal-title');
+  backdrop.innerHTML = `
+    <div id="su-modal-card">
+      <div id="su-modal-icon">🔄</div>
+      <div id="su-modal-title">Switch Student?</div>
+      <div id="su-modal-who"></div>
+      <div id="su-modal-note">
+        <span>⚠️ Heads up:</span> Switching will sign you out.
+        Any unsaved quiz progress in this session will be lost.
+        You will need to sign in again to keep saving your scores.
+      </div>
+      <div id="su-modal-btns">
+        <button id="su-btn-keep" onclick="_closeSwitchUserModal()">Stay Signed In</button>
+        <button id="su-btn-switch" onclick="_doSwitchUser()">Yes, Switch →</button>
+      </div>
+    </div>
+  `;
+  backdrop.addEventListener('click', function(e){
+    if (e.target === backdrop) _closeSwitchUserModal();
+  });
+  document.body.appendChild(backdrop);
+}
+
+function _openSwitchUserModal(){
+  _injectSwitchUserStyles();
+  _buildSwitchUserModal();
+  const who = document.getElementById('su-modal-who');
+  if (who && SESSION.fullName) {
+    who.innerHTML = 'Currently signed in as<br><strong>' + SESSION.fullName + '</strong> · ' + SESSION.section;
+  } else if (who) {
+    who.innerHTML = 'You are currently signed in.';
+  }
+  const backdrop = document.getElementById('su-modal-backdrop');
+  backdrop.classList.add('open');
+  lockScroll();
+  setTimeout(()=>{ document.getElementById('su-btn-keep')?.focus(); }, 80);
+}
+
+function _closeSwitchUserModal(){
+  const backdrop = document.getElementById('su-modal-backdrop');
+  if (!backdrop) return;
+  backdrop.classList.remove('open');
+  unlockScroll();
+}
+
+function _doSwitchUser(){
+  _closeSwitchUserModal();
+  setTimeout(()=>{
+    try { localStorage.removeItem(SESSION_KEY); } catch(err){}
+    SESSION = { studentId:'', fullName:'', section:'' };
+    document.getElementById('lg-userbadge').style.display = 'none';
+    document.getElementById('lg-form').reset();
+    document.getElementById('login-gate').classList.remove('hidden');
+    lockScroll();
+    setTimeout(()=>{ document.getElementById('lg-id')?.focus(); }, 180);
+  }, 220);
+}
+
+function logoutSession(){
+  _openSwitchUserModal();
+}
+
+function showSaveToast(msg, isErr){
+  const t = document.getElementById('save-toast');
+  t.textContent = msg;
+  t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=>{ t.className=''; }, 2600);
+}
+
+let _scrollLockCount = 0;
+function lockScroll(){ if(++_scrollLockCount===1) document.body.style.overflow='hidden'; }
+function unlockScroll(){ if(--_scrollLockCount<=0){ _scrollLockCount=0; document.body.style.overflow=''; } }
+
+/* ============================================================
+   ACTIVITY LAUNCHER — opens external GAS activities in a new tab
+   ============================================================ */
+function launchActivity(url) {
+  if (!url) {
+    showSaveToast('⚠️ No activity available for this section.', true);
+    return;
+  }
+  window.open(url, '_blank');
+}
+
+function loadSec(key){
+  const d = SECS[key]; if(!d) return;
+  currentSecKey = key;
+  S.done.add(key);
+  document.getElementById('prog-bar').style.width = Math.min(95, 10+S.done.size*5)+'%';
+
+  document.querySelectorAll('.nsi').forEach(el=>{
+    el.classList.remove('active');
+    if(el.getAttribute('onclick')?.includes("'"+key+"'")) el.classList.add('active');
+  });
+
+  window.scrollTo({top:0,behavior:'instant'});
+  loadVocabDrawer(key);
+
+  const ca = document.getElementById('ca');
+  let body = '';
+  if(d.layout==='timeline') body = renderTimeline(d);
+  else if(d.layout==='versus') body = renderVersus(d);
+  else if(d.layout==='steps') body = renderSteps(d);
+  
+  // Get the section-specific video ID or fall back to default
+  const videoId = VIDEO_IDS[key] || VIDEO_IDS['default'];
+  
+  let activityButton = '';
+  if (d.activity) {
+    activityButton = `<button class="med-btn activity-btn" onclick="launchActivity('${d.activity}')">🎯 Activity</button>`;
+  }
+  
+  const header = `<div class="ph"><div class="ph-eye">${d.eye}</div><h1 class="ph-title"><span class="ph-emoji">${d.emoji}</span>${d.title}</h1><p class="ph-sub">${d.sub}</p><div class="ph-div"></div><div class="sec-bar"><div class="media-trig"><button class="med-btn" onclick="openVideo('${videoId}')">▶ Watch Intro</button><button class="med-btn" onclick="openVideo('ioL1DSQAH7s')">🎥 Video Highlight: M3 Interview</button>${activityButton}</div><button class="quiz-btn" onclick="openQuiz('${d.quiz||'landforms'}')">🌟 Quiz</button></div></div>`;
+
+  ca.className = '';
+  ca.innerHTML = '';
+  requestAnimationFrame(()=>{
+    ca.className = 'fi';
+    ca.innerHTML = header + body + renderGrammar(d);
+    if(d.layout==='steps') initSteps(d.steps.length);
+    updateTally();
+  });
+}
+
+function renderTimeline(d){ return `<div class="tl-wrap"><div class="tl-spine"></div>${(d.events||[]).map((ev,i)=>`<div class="tl-ev"><div class="tl-card cr" style="animation-delay:${i*.08}s"><div class="tc-era">${ev.era}</div><span class="tc-icon">${ev.icon}</span><div class="tc-title">${ev.title}</div><div class="tc-body">${ev.body}</div></div><div class="tl-node"></div><div style="width:calc(50% - 36px)"></div></div>`).join('')}</div>`; }
+function renderVersus(d){ return `<div class="vs-wrap"><div class="vs-tr"><div class="vs-side" style="border-top:3px solid var(--seafoam)">${d.left?.title||'Side A'}</div><div class="vs-vs">VS</div><div class="vs-side" style="border-top:3px solid var(--coral)">${d.right?.title||'Side B'}</div></div><div class="vs-grid">${(d.rows||[]).map(r=>`<div class="vs-row"><div class="vs-cell L">${r.left}</div><div class="vs-lbl">${r.label}</div><div class="vs-cell R">${r.right}</div></div>`).join('')}</div><div style="text-align:center;margin-top:22px"><button class="quiz-btn" onclick="openQuiz('${d.quiz||'landforms'}')">🌟 Quiz</button></div></div>`; }
+function renderSteps(d){ return `<div class="st-wrap">${(d.steps||[]).map((s,i)=>`<div class="step-row${i===0?' active':''}" id="sr${i}"><div class="step-hdr" onclick="togStep(${i},${d.steps.length})"><div class="step-num">${i+1}</div><div class="step-htitle">${s.title}</div><div class="step-arr">▶</div></div><div class="step-body"><div class="step-content">${s.content}</div><div class="step-prog"><div class="sp-lbl">Progress</div><div class="spb"><div class="spbf" style="width:${s.progress}%"></div></div><div class="sp-lbl" style="text-align:right">${s.progress}%</div></div><div class="step-acts">${i>0?`<button class="btn-s" onclick="togStep(${i-1},${d.steps.length})">← Back</button>`:''}${i<d.steps.length-1?`<button class="btn-p" onclick="advStep(${i},${d.steps.length})">Next →</button>`:`<button class="btn-p" onclick="openQuiz('${d.quiz||'landforms'}')">🌟 Quiz</button>`}</div></div></div>`).join('')}</div>`; }
+
+function _setStepHeight(el,open){
+  const body=el.querySelector('.step-body'); if(!body) return;
+  if(open){
+    body.style.height=body.scrollHeight+'px';
+    body.addEventListener('transitionend',()=>{ if(el.classList.contains('active')) body.style.height='auto'; },{once:true});
+  } else {
+    body.style.height=body.scrollHeight+'px';
+    requestAnimationFrame(()=>{ body.style.height='0'; });
+  }
+}
+function initSteps(n){
+  for(let j=0;j<n;j++){
+    const e=document.getElementById('sr'+j); if(!e) continue;
+    const body=e.querySelector('.step-body'); if(!body) continue;
+    if(e.classList.contains('active')) body.style.height=body.scrollHeight+'px';
+    else body.style.height='0';
+  }
+}
+function togStep(i,n){
+  for(let j=0;j<n;j++){
+    const e=document.getElementById('sr'+j); if(!e) continue;
+    const wasActive=e.classList.contains('active');
+    const willBeActive=(j===i);
+    e.classList.toggle('active',willBeActive);
+    if(wasActive!==willBeActive) _setStepHeight(e,willBeActive);
+  }
+}
+function advStep(i,n){const e=document.getElementById('sr'+i);if(e)e.classList.add('done');togStep(i+1,n);}
+
+function renderGrammar(d){
+  if(!d.grammar || !d.grammar.passage) return '';
+  const passage = d.grammar.passage;
+  return `<div class="gt-wrap"><div class="ph-eye" style="margin-bottom:8px">📝 Word Tag Activity — Tap each word to tag it!</div><h2 style="font-family:var(--f-head);font-size:1.2rem;font-weight:700;color:var(--seafoam-lt);margin-bottom:14px">What type of word is it?</h2><div class="gt-legend"><div class="gt-legend-title">🗂 Word Types — click a word to cycle through 7 types:</div><div class="leg-item"><div class="leg-dot noun-d"></div>Common Noun (blue solid underline) = general person, place, thing</div><div class="leg-item"><div class="leg-dot propnoun-d"></div>Proper Noun (gold double underline) = specific name, place, brand</div><div class="leg-item"><div class="leg-dot verb-d"></div>Verb (green box) = action or state</div><div class="leg-item"><div class="leg-dot adj-d"></div>Adjective (orange oval) = describes a noun</div><div class="leg-item"><div class="leg-dot adv-d"></div>Adverb (purple dashed) = how / when / where</div><div class="leg-item"><div class="leg-dot conj-d"></div>Conjunction (pink dotted) = joins words or clauses</div><div class="leg-item"><div class="leg-dot prep-d"></div>Preposition (teal italic box) = shows relationship (in, on, across)</div></div><div class="gt-instructions"><strong>How to play:</strong> Tap any highlighted word to tag it. Keep tapping the SAME word to cycle through the 7 types. Each tagged word shows a small <strong>type badge</strong> (CN, PN, V, ADJ, ADV, CJ, PR) and a <strong>hover tooltip</strong> explains it. Press <strong>Check My Answers</strong> to see how you did! 🎉</div><div class="gt-passage">${passage}</div><div class="gt-footer"><button class="gt-check-btn" onclick="checkGrammar()">✅ Check My Answers</button><button class="gt-reset-btn" onclick="resetGrammar()">🔄 Start Over</button><span class="gt-tally" id="gt-tally">0 words tagged</span></div></div>`;
+}
+
+function loadVocabDrawer(key){ const words=VOCAB[key]||[]; document.getElementById('vd-list').innerHTML=words.map((v,i)=>`<div class="vcard" id="vc${i}"><div class="vw" onclick="togV(${i})">${v.w} <span class="vpos">${v.pos}</span></div><div class="vphon">/${v.p}/</div><div class="vexp"><div class="vdef">${v.d}</div><div class="veg" onclick="openVocabModal(${i},'${key}')" style="cursor:pointer;text-decoration:underline dotted var(--border-glow);">"${v.e}" 🔍</div></div></div>`).join(''); }
+function togV(i){
+  const c=document.getElementById('vc'+i); if(!c)return;
+  const was=c.classList.contains('open');
+  document.querySelectorAll('.vcard.open').forEach(x=>{
+    x.classList.remove('open');
+    const exp=x.querySelector('.vexp'); if(!exp) return;
+    exp.style.height=exp.scrollHeight+'px';
+    requestAnimationFrame(()=>{ exp.style.height='0'; });
+  });
+  if(!was){
+    c.classList.add('open');
+    const exp=c.querySelector('.vexp'); if(!exp) return;
+    exp.style.height=exp.scrollHeight+'px';
+    exp.addEventListener('transitionend',()=>{ if(c.classList.contains('open')) exp.style.height='auto'; },{once:true});
+  }
+}
+function filterVocab(q){ const lq=q.toLowerCase(); document.querySelectorAll('.vcard').forEach(c=>{const w=c.querySelector('.vw')?.textContent.toLowerCase()||''; c.style.display=w.includes(lq)?'':'none';}); }
+function toggleVocabDrawer(){ S.vocabOpen=!S.vocabOpen; document.getElementById('vd').classList.toggle('open',S.vocabOpen); document.getElementById('cpane').classList.toggle('vd-open',S.vocabOpen); }
+
+function openVocabModal(idx,key){ const v=(VOCAB[key]||[])[idx]; if(!v)return; const posColors={noun:'#6CB4F5',verb:'#4CAF50',adjective:'#FF9800',adverb:'#CE93D8'}; const col=posColors[v.pos]||'var(--seafoam)'; document.getElementById('pm-title').textContent='📖 Word Explorer'; document.getElementById('pm-body').innerHTML=`<div class="vp-word">${v.w}</div><div class="vp-pos-row"><span class="vp-pos" style="color:${col};border-color:${col}40;background:${col}18">${v.pos}</span><span class="vp-pron">/${v.p}/</span></div><div class="vp-def">${v.d}</div><div class="vp-example-label">Example</div><div class="vp-example-box">"${v.e.replace(new RegExp('\\b'+v.w+'\\b','gi'),m=>`<em>${m}</em>`)}"</div>`; openM('pm'); }
+
+function openVideo(vid){ document.getElementById('vc').innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&rel=0&modestbranding=1" allow="autoplay;encrypted-media" allowfullscreen></iframe>`; openM('tm'); }
+function openM(id){ document.getElementById(id).classList.add('open'); lockScroll(); }
+function closeM(id){
+  document.getElementById(id).classList.remove('open');
+  if(id==='tm') document.getElementById('vc').innerHTML='';
+  unlockScroll();
+}
+function closeBk(e,id){ if(e.target===document.getElementById(id)) closeM(id); }
+
+function toggleSidebar(){ S.sidebarOpen=!S.sidebarOpen; document.getElementById('lsb').classList.toggle('closed',!S.sidebarOpen); document.getElementById('cpane').classList.toggle('sb-closed',!S.sidebarOpen); }
+
+/* ============================================================
+   GRAMMAR TAGGING — 7 categories (Common Noun, Proper Noun,
+   Verb, Adjective, Adverb, Conjunction, Preposition)
+   ============================================================ */
+const TAG_CYCLE_MAX = 8; // states 0..7 (0 = untagged)
+const TAG_BADGES = { 1:'CN', 2:'V', 3:'ADJ', 4:'ADV', 5:'CJ', 6:'PR', 7:'PN' };
+const TAG_TITLES = {
+  1:'Common Noun — a general person, place, or thing',
+  2:'Verb — an action or state of being',
+  3:'Adjective — describes a noun',
+  4:'Adverb — how, when, or where',
+  5:'Conjunction — joins words or clauses (and, but, or, while)',
+  6:'Preposition — shows relationship (in, on, across, through, of, to)',
+  7:'Proper Noun — a specific name or place (Zagros, Iran, Tigris)'
+};
+
+function tagWord(el){
+  const cur = parseInt(el.dataset.state || '0');
+  const next = (cur + 1) % TAG_CYCLE_MAX;
+  el.dataset.state = next;
+  el.className = 'tw' + (next > 0 ? ' s' + next : '');
+  if (next > 0) {
+    el.setAttribute('data-badge', TAG_BADGES[next] || '');
+    el.setAttribute('title', TAG_TITLES[next] || '');
+  } else {
+    el.removeAttribute('data-badge');
+    el.removeAttribute('title');
+  }
+  el.classList.add('pop');
+  setTimeout(()=>el.classList.remove('pop'), 220);
+  updateTally();
+}
+function updateTally(){ const tagged=document.querySelectorAll('.tw[data-state]:not([data-state="0"])').length; const total=document.querySelectorAll('.tw').length; const el=document.getElementById('gt-tally'); if(el) el.textContent=tagged+'/'+total+' words tagged'; }
+function resetGrammar(){ document.querySelectorAll('.tw').forEach(el=>{el.dataset.state='0';el.className='tw';el.removeAttribute('data-badge');el.removeAttribute('title');}); updateTally(); }
+function checkGrammar(){
+  const words=document.querySelectorAll('.tw');
+  let correct=0,wrong=0,unattempted=0;
+  const breakdown={1:0,2:0,3:0,4:0,5:0,6:0,7:0};
+  const wrongArr=[];
+  const detail=[];
+  words.forEach(el=>{
+    const ans=parseInt(el.dataset.ans);
+    const got=parseInt(el.dataset.state||'0');
+    const word=el.textContent.trim();
+    if(got===0){unattempted++;detail.push({word,tagged:null,correct:ans,isCorrect:false});return;}
+    if(got===ans){correct++;breakdown[ans]++;detail.push({word,tagged:got,correct:ans,isCorrect:true});}
+    else{wrong++;wrongArr.push(word);detail.push({word,tagged:got,correct:ans,isCorrect:false});}
+  });
+  const total=words.length;
+  const pct=Math.round((correct/total)*100);
+  const grade=pct>=80?'⭐⭐⭐ Amazing!':pct>=60?'⭐⭐ Good!':pct>=40?'⭐ Keep trying!':'📚 Try again!';
+  const catLabel={1:'Common Nouns',2:'Verbs',3:'Adjectives',4:'Adverbs',5:'Conjunctions',6:'Prepositions',7:'Proper Nouns'};
+  const catColor={1:'var(--tag-noun)',2:'var(--tag-verb)',3:'var(--tag-adj)',4:'var(--tag-adv)',5:'var(--tag-conj)',6:'var(--tag-prep)',7:'var(--tag-propnoun)'};
+  submitGrammarCompletion({correct,wrong,unattempted,total,pct,detail});
+  document.getElementById('gtm-title').textContent='Word Tag Results 🏆';
+  document.getElementById('gtm-body').innerHTML=`<div style="text-align:center;margin-bottom:18px"><div style="font-family:var(--f-fun);font-size:3rem;color:var(--seafoam)">${pct}%</div><div style="font-size:1.1rem;font-weight:800;color:var(--chalk);margin-top:4px">${grade}</div><div style="font-size:.85rem;color:var(--ash);margin-top:6px;font-weight:600">${correct} correct · ${wrong} wrong · ${unattempted} not tagged</div></div><div class="gt-score-grid">${Object.entries(breakdown).map(([k,v])=>`<div class="gt-sg-item"><div class="gt-sg-num" style="color:${catColor[k]}">${v}</div><div class="gt-sg-lbl">${catLabel[k]}</div></div>`).join('')}</div>${wrongArr.length?`<div style="margin:10px 0;padding:10px 14px;background:var(--bg-panel);border-radius:var(--r);font-size:.82rem;color:var(--ash);font-weight:600"><strong style="color:var(--coral-br)">Review:</strong> ${wrongArr.join(', ')}</div>`:''}<div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap"><button class="btn-p" onclick="resetGrammar();closeM('gtm')">Try Again</button><button class="btn-s" onclick="closeM('gtm')">Close</button></div>`;
+  openM('gtm');
+}
+
+function submitGrammarCompletion(r){
+  const payload = {
+    studentId: SESSION.studentId,
+    fullName: SESSION.fullName,
+    section: SESSION.section,
+    lessonSection: currentSecKey,
+    correct: r.correct,
+    wrong: r.wrong,
+    unattempted: r.unattempted,
+    total: r.total,
+    percentage: r.pct,
+    detail: r.detail
+  };
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (res && res.success) showSaveToast('✅ Word tagging results saved!');
+      else showSaveToast('⚠️ '+(res && res.message ? res.message : 'Could not save your results.'), true);
+    })
+    .withFailureHandler(()=>{ showSaveToast('⚠️ Connection issue — results not saved.', true); })
+    .submitGrammarResult(payload);
+}
+
+function quizTotalCount(qs){ return qs.reduce((n,q)=>n+(q.type==='match'?q.pairs.length:1),0); }
+function quizIndexLabel(qs,cur){ let n=0; for(let i=0;i<cur;i++) n+=(qs[i].type==='match'?qs[i].pairs.length:1); return n+1; }
+function normAns(s){ return (s||'').toString().trim().toLowerCase().replace(/[.,!?'"]/g,'').replace(/\s+/g,' '); }
+function shuffleArr(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function openQuiz(key){ const qd=QUIZZES[key]||QUIZZES['landforms']; QS={key,cur:0,score:0,answered:false,done:false,data:qd,total:quizTotalCount(qd.qs),responses:[],submitted:false}; document.getElementById('qm-title').textContent='🌟 '+qd.title; renderQ(); openM('qm'); }
+
+function renderQ(){
+  const {data,cur,score,done,total}=QS;
+  const body=document.getElementById('qm-body');
+  if(done){
+    const pct=Math.round((score/total)*100);
+    body.innerHTML=`<div class="qscore"><div class="qscore-num">${pct>=80?'🌟🌟🌟':pct>=60?'🌟🌟':'🌟'}</div><div style="font-family:var(--f-fun);font-size:2.5rem;color:var(--seafoam);margin:8px 0">${score}/${total}</div><div class="qscore-lbl">${pct}% — ${pct>=80?'Excellent!':pct>=60?'Good work!':'Keep trying!'}</div><div class="qscore-msg">${pct>=80?'You\'re a geography expert!':pct>=60?'Great job!':'Keep reading and try again!'}</div><div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap"><button class="btn-p" onclick="openQuiz('${QS.key}')">🔄 Play Again</button><button class="btn-s" onclick="closeM('qm')">Back to Lesson</button></div></div>`;
+    return;
+  }
+  const q=data.qs[cur];
+  const qnum=quizIndexLabel(data.qs,cur);
+  const header=`<div style="font-family:var(--f-body);font-size:.75rem;font-weight:700;color:var(--stone);margin-bottom:10px">Question ${qnum} of ${total} · ⭐ Score: ${score}</div>`;
+  const typeBadge={id:'✏️ Identification',mc:'🔘 Multiple Choice',tf:'☑️ True or False',match:'🔗 Matching Type'}[q.type]||'';
+  const badge=`<div class="qtype-badge">${typeBadge}</div>`;
+
+  if(q.type==='mc'){
+    body.innerHTML=header+badge+`<div class="qq-text">${q.q}</div><div class="qq-opts">${q.opts.map((o,i)=>`<button class="qopt" id="qo${i}" onclick="ansQ(${i})">${o}</button>`).join('')}</div><div class="qfb" id="qfb"></div><div class="qnav"><div></div><button class="btn-s" id="qnxt" style="display:none" onclick="nextQ()">${cur<data.qs.length-1?'Next →':'See Score 🌟'}</button></div>`;
+  } else if(q.type==='tf'){
+    body.innerHTML=header+badge+`<div class="qq-text">${q.q}</div><div class="qtf-opts"><button class="qopt" id="qo0" onclick="ansTF(true)">✅ True</button><button class="qopt" id="qo1" onclick="ansTF(false)">❌ False</button></div><div class="qfb" id="qfb"></div><div class="qnav"><div></div><button class="btn-s" id="qnxt" style="display:none" onclick="nextQ()">${cur<data.qs.length-1?'Next →':'See Score 🌟'}</button></div>`;
+  } else if(q.type==='id'){
+    body.innerHTML=header+badge+`<div class="qq-text">${q.q}</div><input type="text" class="qid-input" id="qid-in" placeholder="Type your answer…" onkeydown="if(event.key==='Enter')ansID()"><div class="qfb" id="qfb"></div><div class="qsubmit-row"><button class="btn-p" id="qsubmit" onclick="ansID()">Submit</button></div><div class="qnav"><div></div><button class="btn-s" id="qnxt" style="display:none" onclick="nextQ()">${cur<data.qs.length-1?'Next →':'See Score 🌟'}</button></div>`;
+    setTimeout(()=>document.getElementById('qid-in')?.focus(),50);
+  } else if(q.type==='match'){
+    const pairs=q.pairs;
+    const allDescs=pairs.map(p=>p.r);
+    body.innerHTML=header+badge+`<div class="qq-text">${q.q}</div><div class="qmatch-list">${pairs.map((p,i)=>{
+      const opts=shuffleArr(allDescs);
+      return `<div class="qmatch-row" id="qmr${i}"><div class="qmatch-prompt">${p.l}</div><select class="qmatch-select" id="qms${i}"><option value="">— choose a match —</option>${opts.map(o=>`<option value="${o.replace(/"/g,'&quot;')}">${o}</option>`).join('')}</select></div>`;
+    }).join('')}</div><div class="qfb" id="qfb"></div><div class="qsubmit-row"><button class="btn-p" id="qsubmit" onclick="ansMatch()">Submit</button></div><div class="qnav"><div></div><button class="btn-s" id="qnxt" style="display:none" onclick="nextQ()">${cur<data.qs.length-1?'Next →':'See Score 🌟'}</button></div>`;
+  }
+}
+
+function lockNav(){ document.getElementById('qnxt').style.display='inline-flex'; const sub=document.getElementById('qsubmit'); if(sub) sub.style.display='none'; }
+
+function ansQ(i){ if(QS.answered)return; QS.answered=true; const q=QS.data.qs[QS.cur]; const ok=q.c===i; if(ok)QS.score++; document.querySelectorAll('.qopt').forEach((el,j)=>{el.onclick=null; if(j===i)el.classList.add(ok?'correct':'wrong'); if(j===q.c&&!ok)el.classList.add('show-c');}); const fb=document.getElementById('qfb'); fb.innerHTML=(ok?'✅ Correct! ':'❌ Not quite. ')+q.e; fb.className='qfb show '+(ok?'correct':'wrong'); QS.responses.push({type:'mc',question:q.q,chosen:q.opts[i],correctAnswer:q.opts[q.c],isCorrect:ok}); lockNav(); }
+
+function ansTF(val){ if(QS.answered)return; QS.answered=true; const q=QS.data.qs[QS.cur]; const ok=q.a===val; if(ok)QS.score++; const i=val?0:1; const ci=q.a?0:1; document.querySelectorAll('.qopt').forEach((el,j)=>{el.onclick=null; if(j===i)el.classList.add(ok?'correct':'wrong'); if(j===ci&&!ok)el.classList.add('show-c');}); const fb=document.getElementById('qfb'); fb.innerHTML=(ok?'✅ Correct! ':'❌ Not quite. ')+q.e; fb.className='qfb show '+(ok?'correct':'wrong'); QS.responses.push({type:'tf',question:q.q,chosen:val,correctAnswer:q.a,isCorrect:ok}); lockNav(); }
+
+function ansID(){ if(QS.answered)return; const input=document.getElementById('qid-in'); const val=normAns(input.value); if(!val){ input.focus(); return; } QS.answered=true; const q=QS.data.qs[QS.cur]; const accepted=[q.a].concat(q.alt||[]).map(normAns); const ok=accepted.includes(val); if(ok)QS.score++; input.disabled=true; input.classList.add(ok?'correct':'wrong'); const fb=document.getElementById('qfb'); fb.innerHTML=(ok?'✅ Correct! ':`❌ Not quite — the answer is "${q.a}". `)+q.e; fb.className='qfb show '+(ok?'correct':'wrong'); QS.responses.push({type:'id',question:q.q,chosen:input.value.trim(),correctAnswer:q.a,isCorrect:ok}); lockNav(); }
+
+function ansMatch(){ if(QS.answered)return; const q=QS.data.qs[QS.cur]; const pairs=q.pairs; let allChosen=true; const sels=[]; for(let i=0;i<pairs.length;i++){ const sel=document.getElementById('qms'+i); sels.push(sel); if(!sel.value) allChosen=false; } if(!allChosen) return; QS.answered=true; let correctCount=0; const matchDetail=[]; pairs.forEach((p,i)=>{ const sel=sels[i]; const row=document.getElementById('qmr'+i); const ok=sel.value===p.r; if(ok){correctCount++; row.classList.add('correct');} else { row.classList.add('wrong'); } sel.disabled=true; matchDetail.push({prompt:p.l,chosen:sel.value,correctAnswer:p.r,isCorrect:ok}); }); QS.score+=correctCount; const pct=Math.round((correctCount/pairs.length)*100); const fb=document.getElementById('qfb'); const ok=correctCount===pairs.length; fb.innerHTML=(ok?'✅ All matched correctly! ':`📊 ${correctCount}/${pairs.length} correct. `)+'Review any highlighted rows above.'; fb.className='qfb show '+(ok?'correct':'wrong'); QS.responses.push({type:'match',question:q.q,pairs:matchDetail,correctCount,total:pairs.length}); lockNav(); }
+
+function nextQ(){ QS.cur++; QS.answered=false; if(QS.cur>=QS.data.qs.length){ QS.done=true; submitQuizCompletion(); } renderQ(); }
+
+function submitQuizCompletion(){
+  if (QS.submitted) return;
+  QS.submitted = true;
+  const payload = {
+    studentId: SESSION.studentId,
+    fullName: SESSION.fullName,
+    section: SESSION.section,
+    quizKey: QS.key,
+    quizTitle: QS.data.title,
+    score: QS.score,
+    total: QS.total,
+    percentage: Math.round((QS.score/QS.total)*100),
+    responses: QS.responses
+  };
+  google.script.run
+    .withSuccessHandler(res=>{
+      if (res && res.success) showSaveToast('✅ Quiz score saved!');
+      else { QS.submitted = false; showSaveToast('⚠️ '+(res && res.message ? res.message : 'Could not save your score.'), true); }
+    })
+    .withFailureHandler(err=>{
+      QS.submitted = false;
+      showSaveToast('⚠️ Connection issue — your score was not saved. Try again.', true);
+    })
+    .submitQuizScore(payload);
+}
+
+/* ===== DRILL-DOWN OVERLAY CONTROLS ===== */
+function openDrillOverlay(id) {
+  const overlay = document.getElementById(id);
+  if (overlay) { overlay.classList.add('open'); lockScroll(); }
+}
+
+function closeDrillOverlay(event, id) {
+  const overlay = document.getElementById(id);
+  if (!overlay) return;
+  if (event && event.target !== overlay && !event.target.closest('.drill-close-btn')) return;
+  overlay.classList.remove('open');
+  unlockScroll();
+}
+
+/* init */
+window.addEventListener('DOMContentLoaded',()=>{ initSession(); if(window.innerWidth>=760){ S.sidebarOpen=true; document.getElementById('lsb').classList.remove('closed'); document.getElementById('cpane').classList.remove('sb-closed'); } loadSec('landforms'); document.querySelector('.nsi')?.classList.add('active'); });
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('tm')?.classList.contains('open')){closeM('tm');return;}
+    if(document.getElementById('nm')?.classList.contains('open')){closeM('nm');return;}
+    ['pm','qm','gtm'].forEach(id=>{if(document.getElementById(id)?.classList.contains('open'))closeM(id);});
+    ['drill-zagros','drill-taurus','drill-elburz','drill-anatolian','drill-iranian-plateau','drill-arabian-peninsula','drill-tigris-euphrates','drill-nile','drill-jordan','drill-rub-al-khali','drill-syrian-desert','drill-dasht-lut','drill-dasht-kavir','drill-persian-gulf','drill-red-sea','drill-arabian-sea','drill-mediterranean','drill-desert-climate','drill-mediterranean-climate','drill-steppe-climate','drill-highland-climate','drill-desert-vegetation','drill-mediterranean-vegetation','drill-steppe-vegetation','drill-montane-forest','drill-oil','drill-minerals','drill-water-resources','drill-agriculture','drill-urban','drill-pastoralism','drill-forestry'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el && el.classList.contains('open')){ el.classList.remove('open'); unlockScroll(); }
+    });
+  }
+});
+</script>

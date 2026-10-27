@@ -1,0 +1,1252 @@
+<script>
+/* ============================================================
+   TEACHER DASHBOARD — Southwest Asia M3 Analytics
+   ============================================================ */
+
+const TEACHER_PIN_STORAGE_KEY = 'm3_swasia_teacher_unlocked_v3';
+
+const DB_STATE = {
+  unlocked: false,
+  currentView: 'quiz',
+  sectionFilter: 'ALL',
+  quizData: null,
+  grammarData: null,
+  reteachStatuses: {},
+  loading: false
+};
+
+/* ============================================================
+   PIN GATE
+   ============================================================ */
+function initTeacherDashboard() {
+  try {
+    const unlocked = sessionStorage.getItem(TEACHER_PIN_STORAGE_KEY);
+    if (unlocked === 'yes') {
+      DB_STATE.unlocked = true;
+      showDashboard();
+      refreshAll();
+      return;
+    }
+  } catch (err) {}
+
+  document.getElementById('pin-input').addEventListener('input', function(e) {
+    e.target.value = (e.target.value || '').replace(/\D/g, '').slice(0, 8);
+  });
+  setTimeout(function() {
+    document.getElementById('pin-input').focus();
+  }, 100);
+}
+
+function handlePinSubmit(evt) {
+  evt.preventDefault();
+  const pin = document.getElementById('pin-input').value.trim();
+  const errEl = document.getElementById('pin-errmsg');
+  const inp = document.getElementById('pin-input');
+  const btn = document.getElementById('pin-submit-btn');
+
+  inp.classList.remove('err');
+  errEl.classList.remove('show');
+  errEl.textContent = '';
+
+  if (!pin) {
+    inp.classList.add('err');
+    errEl.textContent = 'Please enter the PIN.';
+    errEl.classList.add('show');
+    return false;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res && res.success) {
+        try { sessionStorage.setItem(TEACHER_PIN_STORAGE_KEY, 'yes'); } catch (err) {}
+        DB_STATE.unlocked = true;
+        showDashboard(res.spreadsheetUrl);
+        refreshAll();
+      } else {
+        inp.classList.add('err');
+        errEl.textContent = (res && res.message) ? res.message : 'Incorrect PIN. Try again.';
+        errEl.classList.add('show');
+        inp.value = '';
+        inp.focus();
+      }
+      btn.disabled = false;
+      btn.textContent = 'Unlock Dashboard →';
+    })
+    .withFailureHandler(function() {
+      inp.classList.add('err');
+      errEl.textContent = 'Connection error. Please try again.';
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Unlock Dashboard →';
+    })
+    .teacherLogin(pin);
+
+  return false;
+}
+
+function showDashboard(spreadsheetUrl) {
+  document.getElementById('pin-gate').classList.add('hidden');
+  document.getElementById('dashboard').style.display = 'block';
+  if (spreadsheetUrl) {
+    try {
+      document.getElementById('db-sheet-link').href = spreadsheetUrl;
+    } catch (err) {}
+  }
+}
+
+function logoutTeacher() {
+  try { sessionStorage.removeItem(TEACHER_PIN_STORAGE_KEY); } catch (err) {}
+  DB_STATE.unlocked = false;
+  DB_STATE.quizData = null;
+  DB_STATE.grammarData = null;
+  DB_STATE.reteachStatuses = {};
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('pin-gate').classList.remove('hidden');
+  document.getElementById('pin-input').value = '';
+  setTimeout(function() { document.getElementById('pin-input').focus(); }, 100);
+}
+
+/* ============================================================
+   DATA REFRESH
+   ============================================================ */
+function refreshAll() {
+  if (!DB_STATE.unlocked || DB_STATE.loading) return;
+  DB_STATE.loading = true;
+  DB_STATE.sectionFilter = document.getElementById('section-filter').value;
+
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Loading…';
+
+  document.getElementById('db-loading').style.display = 'flex';
+  document.getElementById('db-content').style.display = 'none';
+
+  google.script.run
+    .withSuccessHandler(function(quizRes) {
+      if (!quizRes || !quizRes.success) {
+        handleRefreshError('Could not load quiz analytics. ' + ((quizRes && quizRes.message) || ''));
+        return;
+      }
+      DB_STATE.quizData = quizRes;
+
+      google.script.run
+        .withSuccessHandler(function(grammarRes) {
+          if (!grammarRes || !grammarRes.success) {
+            handleRefreshError('Could not load grammar analytics. ' + ((grammarRes && grammarRes.message) || ''));
+            return;
+          }
+          DB_STATE.grammarData = grammarRes;
+
+          google.script.run
+            .withSuccessHandler(function(statusRes) {
+              if (statusRes && statusRes.success) {
+                DB_STATE.reteachStatuses = statusRes.statuses || {};
+              } else {
+                DB_STATE.reteachStatuses = {};
+              }
+              finishRefresh();
+            })
+            .withFailureHandler(function() {
+              DB_STATE.reteachStatuses = {};
+              finishRefresh();
+            })
+            .getReteachStatusMap();
+        })
+        .withFailureHandler(function() {
+          handleRefreshError('Connection error loading grammar analytics.');
+        })
+        .getGrammarAnalytics(DB_STATE.sectionFilter);
+    })
+    .withFailureHandler(function() {
+      handleRefreshError('Connection error loading quiz analytics.');
+    })
+    .getQuizAnalytics(DB_STATE.sectionFilter);
+}
+
+function handleRefreshError(msg) {
+  DB_STATE.loading = false;
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = false;
+  btn.textContent = '🔄 Refresh Data';
+  document.getElementById('db-loading').style.display = 'none';
+  document.getElementById('db-content').style.display = 'block';
+
+  const content = document.getElementById('db-content');
+  content.innerHTML =
+    '<div class="empty-state">' +
+      '<div class="empty-state-icon">⚠️</div>' +
+      '<div class="empty-state-title">Could Not Load Data</div>' +
+      '<div class="empty-state-sub">' + escapeHtml(msg) + '</div>' +
+    '</div>';
+}
+
+function finishRefresh() {
+  DB_STATE.loading = false;
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = false;
+  btn.textContent = '🔄 Refresh Data';
+
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('last-updated').textContent = 'Last updated: ' + hh + ':' + mm;
+
+  document.getElementById('db-loading').style.display = 'none';
+  renderContent();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderContent() {
+  document.getElementById('db-content').style.display = 'block';
+  document.getElementById('db-content').innerHTML =
+    '<section class="snapshot-section">' +
+      '<h2 class="snapshot-title">📊 Class Snapshot</h2>' +
+      '<div class="snapshot-grid" id="snapshot-grid"></div>' +
+      '<div class="snapshot-priority" id="snapshot-priority"></div>' +
+    '</section>' +
+    '<section class="view-tabs-section">' +
+      '<div class="view-tabs">' +
+        '<button class="view-tab' + (DB_STATE.currentView === 'quiz' ? ' active' : '') + '" id="tab-quiz" onclick="switchView(\'quiz\')">📝 Quiz Analytics</button>' +
+        '<button class="view-tab' + (DB_STATE.currentView === 'grammar' ? ' active' : '') + '" id="tab-grammar" onclick="switchView(\'grammar\')">🏷️ Grammar Tagging</button>' +
+      '</div>' +
+    '</section>' +
+    '<section id="quiz-view"' + (DB_STATE.currentView === 'quiz' ? '' : ' style="display:none;"') + '>' +
+      '<div class="section-list" id="quiz-section-list"></div>' +
+    '</section>' +
+    '<section id="grammar-view"' + (DB_STATE.currentView === 'grammar' ? '' : ' style="display:none;"') + '>' +
+      '<div class="section-list" id="grammar-section-list"></div>' +
+    '</section>';
+
+  renderSnapshot();
+  renderQuizSections();
+  renderGrammarSections();
+}
+
+function renderSnapshot() {
+  const grid = document.getElementById('snapshot-grid');
+  const priorityBox = document.getElementById('snapshot-priority');
+  if (!grid || !priorityBox) return;
+
+  const quiz = DB_STATE.quizData;
+  const grammar = DB_STATE.grammarData;
+
+  const totalQuestionsAnswered = quiz ? quiz.grandTotal : 0;
+  const totalCorrect = quiz ? quiz.grandCorrect : 0;
+  const totalWrong = quiz ? quiz.grandWrong : 0;
+  const grandPct = quiz ? quiz.grandPercentage : 0;
+
+  const totalQuizSections = quiz && quiz.sections ? quiz.sections.length : 0;
+  const totalGrammarSections = grammar && grammar.sections ? grammar.sections.length : 0;
+
+  grid.innerHTML =
+    '<div class="snapshot-card">' +
+      '<div class="snapshot-card-num" style="color:var(--t-gold-lt)">' + totalQuestionsAnswered + '</div>' +
+      '<div class="snapshot-card-lbl">Total Answers Recorded</div>' +
+    '</div>' +
+    '<div class="snapshot-card">' +
+      '<div class="snapshot-card-num" style="color:' + pctColor(grandPct) + '">' + grandPct + '%</div>' +
+      '<div class="snapshot-card-lbl">Overall Accuracy</div>' +
+    '</div>' +
+    '<div class="snapshot-card">' +
+      '<div class="snapshot-card-num" style="color:var(--t-green-lt)">' + totalCorrect + '</div>' +
+      '<div class="snapshot-card-lbl">Total Correct</div>' +
+    '</div>' +
+    '<div class="snapshot-card">' +
+      '<div class="snapshot-card-num" style="color:var(--t-red-lt)">' + totalWrong + '</div>' +
+      '<div class="snapshot-card-lbl">Total Wrong</div>' +
+    '</div>' +
+    '<div class="snapshot-card">' +
+      '<div class="snapshot-card-num" style="color:var(--t-gold-lt)">' + totalQuizSections + '</div>' +
+      '<div class="snapshot-card-lbl">Quiz Sections</div>' +
+    '</div>' +
+    '<div class="snapshot-card">' +
+      '<div class="snapshot-card-num" style="color:var(--t-gold-lt)">' + totalGrammarSections + '</div>' +
+      '<div class="snapshot-card-lbl">Grammar Sections</div>' +
+    '</div>';
+
+  let hardest = null;
+  if (quiz && quiz.sections) {
+    quiz.sections.forEach(function(s) {
+      (s.questions || []).forEach(function(q) {
+        if (q.total >= 2) {
+          if (!hardest || q.percentage < hardest.percentage) {
+            hardest = { q: q, section: s };
+          }
+        }
+      });
+    });
+  }
+
+  if (hardest) {
+    priorityBox.style.display = 'flex';
+    priorityBox.innerHTML =
+      '<div class="snapshot-priority-icon">🚨</div>' +
+      '<div class="snapshot-priority-text">' +
+        '<strong>Priority Reteach:</strong> ' +
+        '<em>' + escapeHtml(hardest.q.question) + '</em> ' +
+        '— only <strong>' + hardest.q.percentage + '%</strong> correct ' +
+        '(in <strong>' + escapeHtml(hardest.section.quizTitle || hardest.section.quizKey) + '</strong>). ' +
+        '<a href="#" onclick="event.preventDefault(); openQuestionBreakdown(\'' +
+          escapeAttr(hardest.section.quizKey) + '\',' +
+          hardest.q.order +
+        ')" style="color:var(--t-gold-lt);text-decoration:underline;font-weight:800;margin-left:6px">See which students →</a>' +
+      '</div>';
+  } else {
+    priorityBox.style.display = 'none';
+  }
+}
+
+function switchView(view) {
+  DB_STATE.currentView = view;
+  const tabQuiz = document.getElementById('tab-quiz');
+  const tabGrammar = document.getElementById('tab-grammar');
+  const viewQuiz = document.getElementById('quiz-view');
+  const viewGrammar = document.getElementById('grammar-view');
+  if (!tabQuiz || !tabGrammar) return;
+
+  if (view === 'quiz') {
+    tabQuiz.classList.add('active');
+    tabGrammar.classList.remove('active');
+    viewQuiz.style.display = 'block';
+    viewGrammar.style.display = 'none';
+  } else {
+    tabQuiz.classList.remove('active');
+    tabGrammar.classList.add('active');
+    viewQuiz.style.display = 'none';
+    viewGrammar.style.display = 'block';
+  }
+}
+
+/* ============================================================
+   SECTION META
+   ============================================================ */
+const SECTION_META = {
+  landforms: { emoji: '🏔️', title: 'Mountains & Plateaus' },
+  plains: { emoji: '🌾', title: 'Plains & River Valleys' },
+  deserts: { emoji: '🏜️', title: 'Deserts & Basins' },
+  coasts: { emoji: '🌊', title: 'Coasts & Islands' },
+  climate: { emoji: '🌡️', title: 'Climate Zones' },
+  vegetation: { emoji: '🌿', title: 'Vegetation Types' },
+  resources: { emoji: '⛏️', title: 'Mineral Resources' },
+  landuse: { emoji: '🗺️', title: 'Land Use' }
+};
+
+/* ============================================================
+   QUIZ SECTIONS
+   ============================================================ */
+function renderQuizSections() {
+  const wrap = document.getElementById('quiz-section-list');
+  if (!wrap) return;
+
+  const data = DB_STATE.quizData;
+  if (!data || !data.sections || data.sections.length === 0) {
+    wrap.innerHTML =
+      '<div class="empty-state">' +
+        '<div class="empty-state-icon">📭</div>' +
+        '<div class="empty-state-title">No Quiz Data Yet</div>' +
+        '<div class="empty-state-sub">Once students start submitting quizzes, their answers will appear here with per-question analytics.</div>' +
+      '</div>';
+    return;
+  }
+
+  wrap.innerHTML = data.sections.map(function(s) {
+    return renderQuizSectionCard(s);
+  }).join('');
+}
+
+function renderQuizSectionCard(s) {
+  const meta = SECTION_META[s.quizKey] || { emoji: '📘', title: s.quizTitle };
+  const pillClass = s.avgPercentage >= 80 ? 'strong' : (s.avgPercentage >= 60 ? 'review' : 'reteach');
+
+  var rows = (s.questions || []).map(function(q) {
+    const warn = q.total < 5 ? '<span class="warning-badge" title="Fewer than 5 responses — stats may be unreliable">⚠ small sample</span>' : '';
+    const typeLabel = ({ id: 'ID', mc: 'MC', tf: 'T/F', match: 'Match' })[q.type] || '?';
+
+    const statusKey = 'quiz::' + s.quizKey + '::Q' + q.order;
+    const logEntry = DB_STATE.reteachStatuses[statusKey] || null;
+    const statusBadgeHtml = renderStatusBadge(logEntry);
+
+    return '<tr>' +
+      '<td class="q-num">Q' + q.order + '</td>' +
+      '<td class="q-text">' + escapeHtml(q.question) + warn + '</td>' +
+      '<td><span class="q-type-badge">' + typeLabel + '</span></td>' +
+      '<td class="q-count correct">' + q.correct + '</td>' +
+      '<td class="q-count wrong">' + q.wrong + '</td>' +
+      '<td class="q-count total">' + q.total + '</td>' +
+      '<td class="q-pct-cell">' +
+        '<div class="q-pct-bar-wrap">' +
+          '<div class="q-pct-bar"><div class="q-pct-fill ' + q.status + '" style="width:' + q.percentage + '%"></div></div>' +
+          '<div class="q-pct-num ' + q.status + '">' + q.percentage + '%</div>' +
+        '</div>' +
+      '</td>' +
+      '<td><span class="q-status-badge ' + q.status + '">' + statusLabel(q.status) + '</span></td>' +
+      '<td>' +
+        '<button class="btn-action-pill" onclick="openQuestionBreakdown(\'' + escapeAttr(s.quizKey) + '\',' + q.order + ')">👥 Students</button>' +
+      '</td>' +
+      '<td>' +
+        '<button class="btn-action-pill btn-reteach" onclick="openReteachLogModal(\'quiz\',\'' + escapeAttr(s.quizKey) + '\',\'Q' + q.order + '\',\'' + escapeAttr(q.question) + '\')">📓 Log</button>' +
+        statusBadgeHtml +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  var hardestNote = '';
+  if (s.hardestQuestion && s.hardestQuestion.total >= 2 && s.hardestQuestion.percentage < 80) {
+    hardestNote = '<div class="hardest-note">' +
+      '<strong>🎯 Reteach Target:</strong> ' +
+      'Q' + s.hardestQuestion.order + ' — <em>' + escapeHtml(s.hardestQuestion.question) + '</em> ' +
+      '(only <strong>' + s.hardestQuestion.percentage + '%</strong> correct). ' +
+      '<a href="#" onclick="event.preventDefault(); openQuestionBreakdown(\'' +
+        escapeAttr(s.quizKey) + '\',' + s.hardestQuestion.order +
+      ')" style="color:var(--t-gold-lt);text-decoration:underline;font-weight:800">See which students missed it →</a>' +
+    '</div>';
+  }
+
+  return '<div class="section-card" id="quiz-card-' + s.quizKey + '">' +
+    '<div class="section-card-header" onclick="toggleSectionCard(\'quiz-card-' + s.quizKey + '\')">' +
+      '<div class="section-card-title">' +
+        '<span class="section-card-title-emoji">' + meta.emoji + '</span>' +
+        '<span>' + escapeHtml(meta.title) + '</span>' +
+      '</div>' +
+      '<div class="section-card-meta">' +
+        '<span class="section-card-pill">' + (s.questions || []).length + ' questions</span>' +
+        '<span class="section-card-pill ' + pillClass + '">Class Avg: <strong>' + s.avgPercentage + '%</strong></span>' +
+        '<span class="section-card-arrow">▼</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="section-card-body">' +
+      '<div class="table-wrap">' +
+        '<table class="qtable">' +
+          '<thead><tr>' +
+            '<th>#</th><th>Question</th><th>Type</th>' +
+            '<th style="text-align:center">✓</th>' +
+            '<th style="text-align:center">✗</th>' +
+            '<th style="text-align:center">Total</th>' +
+            '<th>Accuracy</th><th>Status</th><th>Students</th><th>Reteach</th>' +
+          '</tr></thead>' +
+          '<tbody>' + rows + '</tbody>' +
+        '</table>' +
+      '</div>' +
+      hardestNote +
+    '</div>' +
+  '</div>';
+}
+
+/* ============================================================
+   GRAMMAR SECTIONS
+   ============================================================ */
+function renderGrammarSections() {
+  const wrap = document.getElementById('grammar-section-list');
+  if (!wrap) return;
+
+  const data = DB_STATE.grammarData;
+  if (!data || !data.sections || data.sections.length === 0) {
+    wrap.innerHTML =
+      '<div class="empty-state">' +
+        '<div class="empty-state-icon">📭</div>' +
+        '<div class="empty-state-title">No Grammar Data Yet</div>' +
+        '<div class="empty-state-sub">Once students submit their word-tagging activities, analytics will appear here showing which words they mislabel most often.</div>' +
+      '</div>';
+    return;
+  }
+
+  wrap.innerHTML = data.sections.map(function(s) {
+    return renderGrammarSectionCard(s);
+  }).join('');
+}
+
+function renderGrammarSectionCard(s) {
+  const meta = SECTION_META[s.lessonSection] || { emoji: '📘', title: s.lessonSection };
+  const pillClass = s.avgPercentage >= 80 ? 'strong' : (s.avgPercentage >= 60 ? 'review' : 'reteach');
+
+  var rows = (s.words || []).map(function(w, idx) {
+    var mislabelHtml = '';
+    if (w.mislabels && w.mislabels.length > 0) {
+      mislabelHtml = w.mislabels.slice(0, 3).map(function(m) {
+        return '<strong>' + m.count + '×</strong> as ' + escapeHtml(m.label);
+      }).join(', ');
+    } else {
+      mislabelHtml = '—';
+    }
+
+    const warn = w.attempted < 5 ? '<span class="warning-badge">⚠ small sample</span>' : '';
+
+    const identifier = w.word + '::' + w.correctTag;
+    const statusKey = 'grammar::' + s.lessonSection + '::' + identifier;
+    const logEntry = DB_STATE.reteachStatuses[statusKey] || null;
+    const statusBadgeHtml = renderStatusBadge(logEntry);
+
+    return '<tr>' +
+      '<td class="q-num">#' + (idx + 1) + '</td>' +
+      '<td><strong style="color:var(--t-gold-lt);font-size:.95rem">' + escapeHtml(w.word) + '</strong>' + warn + '</td>' +
+      '<td><span class="grammar-chip correct">' + escapeHtml(w.correctTagLabel) + '</span></td>' +
+      '<td class="q-count correct">' + w.correct + '</td>' +
+      '<td class="q-count wrong">' + w.wrong + '</td>' +
+      '<td class="q-count total">' + w.attempted + '</td>' +
+      '<td class="q-pct-cell">' +
+        '<div class="q-pct-bar-wrap">' +
+          '<div class="q-pct-bar"><div class="q-pct-fill ' + w.status + '" style="width:' + w.percentage + '%"></div></div>' +
+          '<div class="q-pct-num ' + w.status + '">' + w.percentage + '%</div>' +
+        '</div>' +
+      '</td>' +
+      '<td><span class="q-status-badge ' + w.status + '">' + statusLabel(w.status) + '</span></td>' +
+      '<td><div class="grammar-mislabel-line">' + mislabelHtml + '</div></td>' +
+      '<td>' +
+        '<button class="btn-action-pill" onclick="openGrammarBreakdown(\'' +
+          escapeAttr(s.lessonSection) + '\',\'' +
+          escapeAttr(w.word) + '\',' +
+          w.correctTag +
+        ')">👥 Students</button>' +
+      '</td>' +
+      '<td>' +
+        '<button class="btn-action-pill btn-reteach" onclick="openReteachLogModal(\'grammar\',\'' + escapeAttr(s.lessonSection) + '\',\'' + escapeAttr(identifier) + '\',\'' + escapeAttr(w.word + ' (correct: ' + w.correctTagLabel + ')') + '\')">📓 Log</button>' +
+        statusBadgeHtml +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  var hardestNote = '';
+  if (s.hardestWord && s.hardestWord.attempted >= 2 && s.hardestWord.percentage < 80) {
+    var topMis = (s.hardestWord.mislabels && s.hardestWord.mislabels.length > 0)
+      ? (' Most common error: tagged as <strong>' + escapeHtml(s.hardestWord.mislabels[0].label) + '</strong>.')
+      : '';
+    hardestNote = '<div class="hardest-note">' +
+      '<strong>🎯 Reteach Target:</strong> the word ' +
+      '<em>"' + escapeHtml(s.hardestWord.word) + '"</em> ' +
+      '(correctly a <strong>' + escapeHtml(s.hardestWord.correctTagLabel) + '</strong>) — only ' +
+      '<strong>' + s.hardestWord.percentage + '%</strong> correct.' +
+      topMis +
+      ' <a href="#" onclick="event.preventDefault(); openGrammarBreakdown(\'' +
+        escapeAttr(s.lessonSection) + '\',\'' +
+        escapeAttr(s.hardestWord.word) + '\',' +
+        s.hardestWord.correctTag +
+      ')" style="color:var(--t-gold-lt);text-decoration:underline;font-weight:800">See which students →</a>' +
+    '</div>';
+  }
+
+  return '<div class="section-card" id="grammar-card-' + s.lessonSection + '">' +
+    '<div class="section-card-header" onclick="toggleSectionCard(\'grammar-card-' + s.lessonSection + '\')">' +
+      '<div class="section-card-title">' +
+        '<span class="section-card-title-emoji">' + meta.emoji + '</span>' +
+        '<span>' + escapeHtml(meta.title) + '</span>' +
+      '</div>' +
+      '<div class="section-card-meta">' +
+        '<span class="section-card-pill">' + (s.words || []).length + ' words</span>' +
+        '<span class="section-card-pill ' + pillClass + '">Class Avg: <strong>' + s.avgPercentage + '%</strong></span>' +
+        '<span class="section-card-arrow">▼</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="section-card-body">' +
+      '<div class="table-wrap">' +
+        '<table class="qtable">' +
+          '<thead><tr>' +
+            '<th>#</th><th>Word</th><th>Correct Tag</th>' +
+            '<th style="text-align:center">✓</th>' +
+            '<th style="text-align:center">✗</th>' +
+            '<th style="text-align:center">Attempts</th>' +
+            '<th>Accuracy</th><th>Status</th><th>Common Mislabel</th><th>Students</th><th>Reteach</th>' +
+          '</tr></thead>' +
+          '<tbody>' + rows + '</tbody>' +
+        '</table>' +
+      '</div>' +
+      hardestNote +
+    '</div>' +
+  '</div>';
+}
+
+/* ============================================================
+   CARD TOGGLE
+   ============================================================ */
+function toggleSectionCard(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('collapsed');
+}
+
+/* ============================================================
+   QUESTION BREAKDOWN MODAL
+   ============================================================ */
+function openQuestionBreakdown(quizKey, questionOrder) {
+  const titleEl = document.getElementById('question-modal-title');
+  const bodyEl = document.getElementById('question-modal-body');
+  titleEl.textContent = '👥 Students — Question Breakdown';
+  bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-ash);font-weight:700">Loading student breakdown…</div>';
+  openModal('question-modal');
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (!res || !res.success) {
+        bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-coral-br);font-weight:700">Failed to load breakdown.</div>';
+        return;
+      }
+
+      titleEl.textContent = '👥 Q' + res.questionOrder + ' — Which Students Got It Wrong?';
+
+      var headerHtml =
+        '<div class="detail-summary">' +
+          '<div class="detail-summary-item" style="flex:2;min-width:260px">' +
+            '<div class="detail-summary-lbl">Question</div>' +
+            '<div class="detail-summary-val" style="font-family:var(--f-body);font-size:.9rem;font-weight:700;line-height:1.4">' +
+              escapeHtml(res.question || '') +
+            '</div>' +
+          '</div>' +
+          '<div class="detail-summary-item">' +
+            '<div class="detail-summary-lbl">Type</div>' +
+            '<div class="detail-summary-val">' + escapeHtml(({id:'ID',mc:'MC',tf:'T/F',match:'Match'})[res.questionType] || res.questionType || '?') + '</div>' +
+          '</div>' +
+          '<div class="detail-summary-item">' +
+            '<div class="detail-summary-lbl">Total Students</div>' +
+            '<div class="detail-summary-val">' + res.totalStudentsConsidered + '</div>' +
+          '</div>' +
+          '<div class="detail-summary-item">' +
+            '<div class="detail-summary-lbl">Missed It</div>' +
+            '<div class="detail-summary-val" style="color:var(--t-red-lt)">' + res.wrong.length + '</div>' +
+          '</div>' +
+          '<div class="detail-summary-item">' +
+            '<div class="detail-summary-lbl">Got It Right</div>' +
+            '<div class="detail-summary-val" style="color:var(--t-green-lt)">' + res.correct.length + '</div>' +
+          '</div>' +
+        '</div>';
+
+      var topWrongHtml = '';
+      if (res.topWrongAnswer && res.topWrongAnswer.count >= 1) {
+        topWrongHtml =
+          '<div class="breakdown-callout">' +
+            '<span style="font-size:1.3rem">📌</span>' +
+            '<div><strong style="color:var(--t-coral-br)">Most common wrong answer:</strong> ' +
+            '<em style="color:var(--t-sand)">' + escapeHtml(res.topWrongAnswer.answer) + '</em> ' +
+            '(' + res.topWrongAnswer.count + ' student' + (res.topWrongAnswer.count === 1 ? '' : 's') + ')</div>' +
+          '</div>';
+      }
+
+      var wrongSection =
+        '<h3 class="breakdown-heading" style="color:var(--t-red-lt)">❌ Missed It — Ask These Students (' + res.wrong.length + ')</h3>';
+
+      if (res.wrong.length === 0) {
+        wrongSection += '<div class="breakdown-empty">🎉 Everyone who has attempted this question got it right!</div>';
+      } else {
+        wrongSection += res.wrong.map(function(w) {
+          return '<div class="student-row wrong">' +
+            '<div class="student-row-name">' +
+              '<span class="student-row-id">' + escapeHtml(w.studentId) + '</span>' +
+              '<span>' + escapeHtml(w.fullName) + '</span>' +
+              '<span class="student-row-section">' + escapeHtml(w.section) + '</span>' +
+            '</div>' +
+            '<div class="student-row-answer">' +
+              '<span class="answer-label">answered:</span> ' +
+              '<em class="answer-value wrong">' + escapeHtml(String(w.chosen || '—')) + '</em>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      var correctSection =
+        '<h3 class="breakdown-heading" style="color:var(--t-green-lt)">✅ Got It Right — Reliable Peer Helpers (' + res.correct.length + ')</h3>';
+
+      if (res.correct.length === 0) {
+        correctSection += '<div class="breakdown-empty">No correct answers yet.</div>';
+      } else {
+        correctSection += res.correct.map(function(c) {
+          return '<div class="student-row correct">' +
+            '<div class="student-row-name">' +
+              '<span class="student-row-id">' + escapeHtml(c.studentId) + '</span>' +
+              '<span>' + escapeHtml(c.fullName) + '</span>' +
+              '<span class="student-row-section">' + escapeHtml(c.section) + '</span>' +
+            '</div>' +
+            '<div class="student-row-answer">' +
+              '<span class="answer-label">answered:</span> ' +
+              '<em class="answer-value correct">' + escapeHtml(String(c.chosen || '—')) + '</em>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      bodyEl.innerHTML = headerHtml + topWrongHtml + wrongSection + correctSection;
+    })
+    .withFailureHandler(function() {
+      bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-coral-br);font-weight:700">Connection error.</div>';
+    })
+    .getQuestionStudentBreakdown(DB_STATE.sectionFilter, quizKey, questionOrder);
+}
+
+/* ============================================================
+   GRAMMAR BREAKDOWN MODAL
+   ============================================================ */
+function openGrammarBreakdown(lessonSection, word, correctTag) {
+  const titleEl = document.getElementById('grammar-modal-title');
+  const bodyEl = document.getElementById('grammar-modal-body');
+  titleEl.textContent = '👥 Word Breakdown';
+  bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-ash);font-weight:700">Loading word breakdown…</div>';
+  openModal('grammar-modal');
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (!res || !res.success) {
+        bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-coral-br);font-weight:700">Failed to load breakdown.</div>';
+        return;
+      }
+
+      titleEl.textContent = '👥 Word "' + res.word + '" — Which Students Mislabeled It?';
+
+      var headerHtml =
+        '<div class="detail-summary">' +
+          '<div class="detail-summary-item" style="flex:2;min-width:220px">' +
+            '<div class="detail-summary-lbl">Word</div>' +
+            '<div class="detail-summary-val" style="font-family:var(--f-head);font-size:1.2rem;color:var(--t-gold-lt)">' +
+              escapeHtml(res.word) +
+            '</div>' +
+          '</div>' +
+          '<div class="detail-summary-item">' +
+            '<div class="detail-summary-lbl">Correct Tag</div>' +
+            '<div class="detail-summary-val" style="color:var(--t-green-lt)">' + escapeHtml(res.correctTagLabel) + '</div>' +
+          '</div>' +
+          '<div class="detail-summary-item">' +
+            '<div class="detail-summary-lbl">Total Students</div>' +
+            '<div class="detail-summary-val">' + res.totalStudentsConsidered + '</div>' +
+          '</div>' +
+          '<div class="detail-summary-item">' +
+            '<div class="detail-summary-lbl">Mislabeled</div>' +
+            '<div class="detail-summary-val" style="color:var(--t-red-lt)">' + res.wrong.length + '</div>' +
+          '</div>' +
+          '<div class="detail-summary-item">' +
+            '<div class="detail-summary-lbl">Correct</div>' +
+            '<div class="detail-summary-val" style="color:var(--t-green-lt)">' + res.correct.length + '</div>' +
+          '</div>' +
+        '</div>';
+
+      var mislabelCallout = '';
+      if (res.mislabelBreakdown && res.mislabelBreakdown.length > 0) {
+        mislabelCallout =
+          '<div class="breakdown-callout">' +
+            '<span style="font-size:1.3rem">📌</span>' +
+            '<div><strong style="color:var(--t-coral-br)">Mislabel summary:</strong> ' +
+              res.mislabelBreakdown.map(function(m) {
+                return '<strong>' + m.count + '×</strong> tagged as <em style="color:var(--t-sand)">' + escapeHtml(m.label) + '</em>';
+              }).join(' · ') +
+            '</div>' +
+          '</div>';
+      }
+
+      var wrongSection =
+        '<h3 class="breakdown-heading" style="color:var(--t-red-lt)">❌ Mislabeled — Ask These Students (' + res.wrong.length + ')</h3>';
+
+      if (res.wrong.length === 0) {
+        wrongSection += '<div class="breakdown-empty">🎉 Everyone who has attempted this word tagged it correctly!</div>';
+      } else {
+        wrongSection += res.wrong.map(function(w) {
+          return '<div class="student-row wrong">' +
+            '<div class="student-row-name">' +
+              '<span class="student-row-id">' + escapeHtml(w.studentId) + '</span>' +
+              '<span>' + escapeHtml(w.fullName) + '</span>' +
+              '<span class="student-row-section">' + escapeHtml(w.section) + '</span>' +
+            '</div>' +
+            '<div class="student-row-answer">' +
+              '<span class="answer-label">tagged as:</span> ' +
+              '<em class="answer-value wrong">' + escapeHtml(w.taggedLabel || '—') + '</em>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      var correctSection =
+        '<h3 class="breakdown-heading" style="color:var(--t-green-lt)">✅ Tagged Correctly — Reliable Peer Helpers (' + res.correct.length + ')</h3>';
+
+      if (res.correct.length === 0) {
+        correctSection += '<div class="breakdown-empty">No correct tags yet.</div>';
+      } else {
+        correctSection += res.correct.map(function(c) {
+          return '<div class="student-row correct">' +
+            '<div class="student-row-name">' +
+              '<span class="student-row-id">' + escapeHtml(c.studentId) + '</span>' +
+              '<span>' + escapeHtml(c.fullName) + '</span>' +
+              '<span class="student-row-section">' + escapeHtml(c.section) + '</span>' +
+            '</div>' +
+            '<div class="student-row-answer">' +
+              '<span class="answer-label">tagged as:</span> ' +
+              '<em class="answer-value correct">' + escapeHtml(c.taggedLabel || '—') + '</em>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      bodyEl.innerHTML = headerHtml + mislabelCallout + wrongSection + correctSection;
+    })
+    .withFailureHandler(function() {
+      bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-coral-br);font-weight:700">Connection error.</div>';
+    })
+    .getGrammarStudentBreakdown(DB_STATE.sectionFilter, lessonSection, word, correctTag);
+}
+
+/* ============================================================
+   RETEACH LOG MODAL
+   ============================================================ */
+let RETEACH_MODAL_STATE = {
+  itemType: 'quiz',
+  quizKey: '',
+  itemIdentifier: '',
+  questionText: '',
+  wrongStudents: []
+};
+
+function openReteachLogModal(itemType, quizKey, itemIdentifier, questionText) {
+  RETEACH_MODAL_STATE = {
+    itemType: itemType,
+    quizKey: quizKey,
+    itemIdentifier: itemIdentifier,
+    questionText: questionText,
+    wrongStudents: []
+  };
+
+  const titleEl = document.getElementById('reteach-log-modal-title');
+  const bodyEl = document.getElementById('reteach-log-modal-body');
+
+  titleEl.textContent = '📓 Log Reteach — ' + itemIdentifier;
+  bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-ash);font-weight:700">Loading log history…</div>';
+  openModal('reteach-log-modal');
+
+  if (itemType === 'quiz') {
+    const orderNum = parseInt(itemIdentifier.replace('Q', ''), 10);
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res && res.success && res.wrong) {
+          RETEACH_MODAL_STATE.wrongStudents = res.wrong.map(function(w) {
+            return w.studentId + ' (' + w.fullName + ')';
+          });
+        }
+        loadReteachHistoryAndRender();
+      })
+      .withFailureHandler(function() {
+        loadReteachHistoryAndRender();
+      })
+      .getQuestionStudentBreakdown(DB_STATE.sectionFilter, quizKey, orderNum);
+  } else {
+    // grammar — parse identifier back
+    const parts = itemIdentifier.split('::');
+    const word = parts[0] || '';
+    const tag = parseInt(parts[1], 10) || 0;
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res && res.success && res.wrong) {
+          RETEACH_MODAL_STATE.wrongStudents = res.wrong.map(function(w) {
+            return w.studentId + ' (' + w.fullName + ')';
+          });
+        }
+        loadReteachHistoryAndRender();
+      })
+      .withFailureHandler(function() {
+        loadReteachHistoryAndRender();
+      })
+      .getGrammarStudentBreakdown(DB_STATE.sectionFilter, quizKey, word, tag);
+  }
+}
+
+function loadReteachHistoryAndRender() {
+  const st = RETEACH_MODAL_STATE;
+
+  if (st.itemType === 'quiz') {
+    google.script.run
+      .withSuccessHandler(function(res) {
+        const logs = (res && res.success) ? res.logs : [];
+        renderReteachLogForm(logs);
+      })
+      .withFailureHandler(function() {
+        renderReteachLogForm([]);
+      })
+      .getReteachLogsForQuestion(st.quizKey, parseInt(st.itemIdentifier.replace('Q', ''), 10));
+  } else {
+    const parts = st.itemIdentifier.split('::');
+    const word = parts[0] || '';
+    const tag = parseInt(parts[1], 10) || 0;
+    google.script.run
+      .withSuccessHandler(function(res) {
+        const logs = (res && res.success) ? res.logs : [];
+        renderReteachLogForm(logs);
+      })
+      .withFailureHandler(function() {
+        renderReteachLogForm([]);
+      })
+      .getReteachLogsForGrammar(st.quizKey, word, tag);
+  }
+}
+
+function renderReteachLogForm(logs) {
+  const bodyEl = document.getElementById('reteach-log-modal-body');
+  const st = RETEACH_MODAL_STATE;
+
+  const now = new Date();
+  const todayStr = now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getDate()).padStart(2, '0');
+
+  // Determine pre-fill from most recent log
+  const latest = (logs && logs.length > 0) ? logs[0] : null;
+  const prefillStatus = latest ? latest.status : 'Needs Reteach';
+  const prefillMethod = latest ? latest.method : 'Oral Recitation';
+  const prefillStudents = latest ? latest.studentsTargeted : (st.wrongStudents.join(', '));
+  const prefillNotes = latest ? latest.notes : '';
+  const prefillPlanned = latest ? latest.datePlanned : todayStr;
+  const prefillCompleted = latest ? latest.dateCompleted : '';
+  const prefillPostCheck = latest ? latest.postCheckResult : 'Not Yet Re-quizzed';
+
+  const formHtml =
+    '<div class="reteach-log-header">' +
+      '<div class="reteach-log-qtext">' +
+        '<div class="reteach-log-qlabel">' + (st.itemType === 'quiz' ? 'Question' : 'Word') + '</div>' +
+        '<div class="reteach-log-qvalue">' + escapeHtml(st.questionText || '') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="reteach-log-form">' +
+      '<div class="reteach-log-row">' +
+        '<div class="reteach-log-field">' +
+          '<label class="reteach-log-label">Status</label>' +
+          '<select class="reteach-log-select" id="rl-status">' +
+            '<option value="Needs Reteach"' + (prefillStatus === 'Needs Reteach' ? ' selected' : '') + '>🔴 Needs Reteach</option>' +
+            '<option value="Scheduled"' + (prefillStatus === 'Scheduled' ? ' selected' : '') + '>🟡 Scheduled</option>' +
+            '<option value="In Progress"' + (prefillStatus === 'In Progress' ? ' selected' : '') + '>🟠 In Progress</option>' +
+            '<option value="Done"' + (prefillStatus === 'Done' ? ' selected' : '') + '>🟢 Done</option>' +
+            '<option value="Verified Improved"' + (prefillStatus === 'Verified Improved' ? ' selected' : '') + '>✅ Verified Improved</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="reteach-log-field">' +
+          '<label class="reteach-log-label">Method</label>' +
+          '<select class="reteach-log-select" id="rl-method">' +
+            '<option value="Oral Recitation"' + (prefillMethod === 'Oral Recitation' ? ' selected' : '') + '>Oral Recitation</option>' +
+            '<option value="Peer Teaching"' + (prefillMethod === 'Peer Teaching' ? ' selected' : '') + '>Peer Teaching</option>' +
+            '<option value="Group Work"' + (prefillMethod === 'Group Work' ? ' selected' : '') + '>Group Work</option>' +
+            '<option value="Mini-Lecture"' + (prefillMethod === 'Mini-Lecture' ? ' selected' : '') + '>Mini-Lecture</option>' +
+            '<option value="Video Review"' + (prefillMethod === 'Video Review' ? ' selected' : '') + '>Video Review</option>' +
+            '<option value="Worksheet"' + (prefillMethod === 'Worksheet' ? ' selected' : '') + '>Worksheet</option>' +
+            '<option value="Other"' + (prefillMethod === 'Other' ? ' selected' : '') + '>Other</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="reteach-log-row">' +
+        '<div class="reteach-log-field">' +
+          '<label class="reteach-log-label">Date Planned</label>' +
+          '<input class="reteach-log-input" id="rl-date-planned" type="date" value="' + escapeAttr(prefillPlanned) + '">' +
+        '</div>' +
+        '<div class="reteach-log-field">' +
+          '<label class="reteach-log-label">Date Completed</label>' +
+          '<input class="reteach-log-input" id="rl-date-completed" type="date" value="' + escapeAttr(prefillCompleted) + '">' +
+        '</div>' +
+      '</div>' +
+      '<div class="reteach-log-field">' +
+        '<label class="reteach-log-label">Students Targeted <span class="reteach-log-hint">(auto-filled from missed list, editable)</span></label>' +
+        '<textarea class="reteach-log-textarea" id="rl-students" rows="2">' + escapeHtml(prefillStudents) + '</textarea>' +
+      '</div>' +
+      '<div class="reteach-log-field">' +
+        '<label class="reteach-log-label">Notes</label>' +
+        '<textarea class="reteach-log-textarea" id="rl-notes" rows="3" placeholder="e.g. Explained peninsula vs. sea with map. Somchai asked why it is called Arabian.">' + escapeHtml(prefillNotes) + '</textarea>' +
+      '</div>' +
+      '<div class="reteach-log-field">' +
+        '<label class="reteach-log-label">Post-Check Result</label>' +
+        '<select class="reteach-log-select" id="rl-post-check">' +
+          '<option value="Not Yet Re-quizzed"' + (prefillPostCheck === 'Not Yet Re-quizzed' ? ' selected' : '') + '>Not Yet Re-quizzed</option>' +
+          '<option value="Improved"' + (prefillPostCheck === 'Improved' ? ' selected' : '') + '>Improved</option>' +
+          '<option value="Same"' + (prefillPostCheck === 'Same' ? ' selected' : '') + '>Same</option>' +
+          '<option value="Worse"' + (prefillPostCheck === 'Worse' ? ' selected' : '') + '>Worse</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="reteach-btn-row">' +
+        '<button class="btn-s" onclick="closeModalBtn(\'reteach-log-modal\')">Cancel</button>' +
+        '<button class="btn-p" id="rl-save-btn" onclick="saveReteachLogFromModal()">💾 Save Log</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="reteach-log-history">' +
+      '<h3 class="reteach-log-history-title">📜 History (' + logs.length + ')</h3>' +
+      renderReteachHistory(logs) +
+    '</div>';
+
+  bodyEl.innerHTML = formHtml;
+}
+
+function renderReteachHistory(logs) {
+  if (!logs || logs.length === 0) {
+    return '<div class="reteach-log-empty">No previous logs for this item yet. Fill in the form above and click Save Log to start tracking.</div>';
+  }
+
+  return logs.map(function(log) {
+    const cls = statusCssClass(log.status);
+    const ts = log.timestamp ? new Date(log.timestamp).toLocaleString() : '—';
+    return '<div class="reteach-log-history-item">' +
+      '<div class="reteach-log-history-head">' +
+        '<span class="reteach-status-badge ' + cls + '">' + escapeHtml(log.status || '—') + '</span>' +
+        '<span class="reteach-log-history-ts">' + escapeHtml(ts) + '</span>' +
+      '</div>' +
+      '<div class="reteach-log-history-meta">' +
+        '<span><strong>Method:</strong> ' + escapeHtml(log.method || '—') + '</span>' +
+        (log.datePlanned ? '<span><strong>Planned:</strong> ' + escapeHtml(log.datePlanned) + '</span>' : '') +
+        (log.dateCompleted ? '<span><strong>Done:</strong> ' + escapeHtml(log.dateCompleted) + '</span>' : '') +
+        (log.postCheckResult ? '<span><strong>Post-check:</strong> ' + escapeHtml(log.postCheckResult) + '</span>' : '') +
+      '</div>' +
+      (log.studentsTargeted ? '<div class="reteach-log-history-students"><strong>Students:</strong> ' + escapeHtml(log.studentsTargeted) + '</div>' : '') +
+      (log.notes ? '<div class="reteach-log-history-notes">' + escapeHtml(log.notes) + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function saveReteachLogFromModal() {
+  const st = RETEACH_MODAL_STATE;
+  const btn = document.getElementById('rl-save-btn');
+
+  const payload = {
+    sectionFilter: DB_STATE.sectionFilter,
+    quizKey: st.quizKey,
+    itemType: st.itemType,
+    itemIdentifier: st.itemIdentifier,
+    questionText: st.questionText,
+    status: document.getElementById('rl-status').value,
+    datePlanned: document.getElementById('rl-date-planned').value,
+    dateCompleted: document.getElementById('rl-date-completed').value,
+    method: document.getElementById('rl-method').value,
+    studentsTargeted: document.getElementById('rl-students').value.trim(),
+    notes: document.getElementById('rl-notes').value.trim(),
+    postCheckResult: document.getElementById('rl-post-check').value
+  };
+
+  btn.disabled = true;
+  btn.textContent = '💾 Saving…';
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      btn.disabled = false;
+      btn.textContent = '💾 Save Log';
+      if (res && res.success) {
+        showToast('✅ Reteach log saved!');
+        // Refresh the local status map and re-render
+        refreshReteachStatusesAndRerender(function() {
+          loadReteachHistoryAndRender();
+        });
+      } else {
+        showToast('⚠️ Could not save log: ' + (res && res.message ? res.message : 'Unknown error'), true);
+      }
+    })
+    .withFailureHandler(function() {
+      btn.disabled = false;
+      btn.textContent = '💾 Save Log';
+      showToast('⚠️ Connection error saving log.', true);
+    })
+    .saveReteachLog(payload);
+}
+
+function refreshReteachStatusesAndRerender(callback) {
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res && res.success) {
+        DB_STATE.reteachStatuses = res.statuses || {};
+        renderQuizSections();
+        renderGrammarSections();
+      }
+      if (callback) callback();
+    })
+    .withFailureHandler(function() {
+      if (callback) callback();
+    })
+    .getReteachStatusMap();
+}
+
+function renderStatusBadge(logEntry) {
+  if (!logEntry || !logEntry.status) return '';
+  const cls = statusCssClass(logEntry.status);
+  const short = statusShortLabel(logEntry.status);
+  var tip = logEntry.status;
+  if (logEntry.datePlanned) tip += ' · planned ' + logEntry.datePlanned;
+  if (logEntry.dateCompleted) tip += ' · done ' + logEntry.dateCompleted;
+  return '<div class="reteach-status-row"><span class="reteach-status-badge ' + cls + '" title="' + escapeAttr(tip) + '">' + escapeHtml(short) + '</span></div>';
+}
+
+function statusCssClass(status) {
+  if (status === 'Needs Reteach') return 'needs-reteach';
+  if (status === 'Scheduled') return 'scheduled';
+  if (status === 'In Progress') return 'in-progress';
+  if (status === 'Done') return 'done';
+  if (status === 'Verified Improved') return 'verified';
+  return 'needs-reteach';
+}
+
+function statusShortLabel(status) {
+  if (status === 'Needs Reteach') return '🔴 Needs';
+  if (status === 'Scheduled') return '🟡 Planned';
+  if (status === 'In Progress') return '🟠 In Progress';
+  if (status === 'Done') return '🟢 Done';
+  if (status === 'Verified Improved') return '✅ Verified';
+  return status;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg, isErr) {
+  var el = document.getElementById('teacher-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'teacher-toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(el._hideTimer);
+  el._hideTimer = setTimeout(function() { el.className = ''; }, 2600);
+}
+
+/* ============================================================
+   STUDENT ATTEMPTS MODAL (kept for full drill-down)
+   ============================================================ */
+function openAttemptsModal(quizKey, quizTitle) {
+  const titleEl = document.getElementById('attempts-modal-title');
+  const bodyEl = document.getElementById('attempts-modal-body');
+  titleEl.textContent = '📝 Attempts — ' + quizTitle;
+  bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-ash);font-weight:700">Loading attempts…</div>';
+  openModal('attempts-modal');
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (!res || !res.success) {
+        bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-coral-br);font-weight:700">Failed to load attempts.</div>';
+        return;
+      }
+      if (!res.attempts || res.attempts.length === 0) {
+        bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-ash);font-weight:700">No attempts yet for this quiz.</div>';
+        return;
+      }
+      bodyEl.innerHTML = res.attempts.map(function(a, idx) {
+        const pct = a.percentage != null ? Number(a.percentage) : 0;
+        const cls = pct >= 80 ? 'strong' : (pct >= 60 ? 'review' : 'reteach');
+        const dateStr = a.timestamp ? new Date(a.timestamp).toLocaleString() : '—';
+        return '<div class="attempt-row" onclick="openAttemptDetail(' + idx + ')">' +
+          '<div class="attempt-row-left">' +
+            '<div class="attempt-row-name">' + escapeHtml(a.fullName || 'Unknown') + ' <span style="color:var(--t-stone);font-weight:600">· ID ' + escapeHtml(a.studentId || '') + '</span></div>' +
+            '<div class="attempt-row-meta">' + escapeHtml(a.section || '') + ' · ' + escapeHtml(dateStr) + '</div>' +
+          '</div>' +
+          '<div class="attempt-row-right">' +
+            '<span class="attempt-score ' + cls + '">' + (a.score != null ? a.score : '?') + '/' + (a.total != null ? a.total : '?') + '</span>' +
+            '<span class="attempt-pct-badge">' + pct + '%</span>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      window.__attemptsCache = res.attempts;
+    })
+    .withFailureHandler(function() {
+      bodyEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t-coral-br);font-weight:700">Connection error.</div>';
+    })
+    .getQuizAttemptsBySection(DB_STATE.sectionFilter, quizKey);
+}
+
+function openAttemptDetail(idx) {
+  const attempts = window.__attemptsCache || [];
+  const a = attempts[idx];
+  if (!a) return;
+
+  const titleEl = document.getElementById('attempt-detail-modal-title');
+  const bodyEl = document.getElementById('attempt-detail-modal-body');
+  titleEl.textContent = '👤 ' + (a.fullName || 'Unknown') + ' — ' + (a.quizTitle || '');
+
+  const pct = a.percentage != null ? Number(a.percentage) : 0;
+  const dateStr = a.timestamp ? new Date(a.timestamp).toLocaleString() : '—';
+
+  const summaryHtml =
+    '<div class="detail-summary">' +
+      '<div class="detail-summary-item"><div class="detail-summary-lbl">Student</div><div class="detail-summary-val">' + escapeHtml(a.fullName || '') + '</div></div>' +
+      '<div class="detail-summary-item"><div class="detail-summary-lbl">ID</div><div class="detail-summary-val">' + escapeHtml(a.studentId || '') + '</div></div>' +
+      '<div class="detail-summary-item"><div class="detail-summary-lbl">Section</div><div class="detail-summary-val">' + escapeHtml(a.section || '') + '</div></div>' +
+      '<div class="detail-summary-item"><div class="detail-summary-lbl">Score</div><div class="detail-summary-val" style="color:' + pctColor(pct) + '">' + (a.score != null ? a.score : '?') + '/' + (a.total != null ? a.total : '?') + ' (' + pct + '%)</div></div>' +
+      '<div class="detail-summary-item"><div class="detail-summary-lbl">Date</div><div class="detail-summary-val" style="font-size:.85rem">' + escapeHtml(dateStr) + '</div></div>' +
+    '</div>';
+
+  const responsesHtml = (a.responses || []).map(function(r, i) {
+    const ok = r.isCorrect === true;
+    const cls2 = ok ? 'correct' : 'wrong';
+    let lines = '';
+
+    if (r.type === 'match') {
+      const pairs = (r.pairs || []).map(function(p) {
+        return '<div style="margin-top:6px;padding:8px;background:var(--t-bg-cave);border-radius:6px;font-size:.75rem">' +
+          '<div style="color:var(--t-ash);font-weight:700">' + escapeHtml(p.prompt || '') + '</div>' +
+          '<div style="color:' + (p.isCorrect ? 'var(--t-green-lt)' : 'var(--t-red-lt)') + ';font-weight:800;margin-top:4px">' +
+            '→ ' + escapeHtml(p.chosen || '—') +
+            (p.isCorrect ? ' ✓' : ' (correct: ' + escapeHtml(p.correctAnswer || '') + ')') +
+          '</div>' +
+        '</div>';
+      }).join('');
+      lines = '<div class="detail-response-line"><span class="detail-response-line-lbl">Matches</span><div class="detail-response-line-val">' + pairs + '</div></div>';
+    } else {
+      const chosen = (r.chosen != null && r.chosen !== '') ? r.chosen : '—';
+      const correct = r.correctAnswer != null ? r.correctAnswer : '—';
+      lines =
+        '<div class="detail-response-line"><span class="detail-response-line-lbl">Answered</span><span class="detail-response-line-val ' + (ok ? 'ok' : 'bad') + '">' + escapeHtml(String(chosen)) + '</span></div>' +
+        (ok ? '' : '<div class="detail-response-line"><span class="detail-response-line-lbl">Correct</span><span class="detail-response-line-val ok">' + escapeHtml(String(correct)) + '</span></div>');
+    }
+
+    return '<div class="detail-response ' + cls2 + '">' +
+      '<div class="detail-response-q">Q' + (i + 1) + '. ' + escapeHtml(r.question || '') + '</div>' +
+      lines +
+    '</div>';
+  }).join('');
+
+  bodyEl.innerHTML = summaryHtml + responsesHtml;
+  openModal('attempt-detail-modal');
+}
+
+/* ============================================================
+   MODAL HELPERS
+   ============================================================ */
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('open');
+}
+function closeModalBtn(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
+function closeModal(event, id) {
+  if (event && event.target === event.currentTarget) {
+    closeModalBtn(id);
+  }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function escapeHtml(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function escapeAttr(s) {
+  return String(s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+function pctColor(p) {
+  if (p >= 80) return 'var(--t-green-lt)';
+  if (p >= 60) return '#FFB74D';
+  return 'var(--t-red-lt)';
+}
+function statusLabel(s) {
+  if (s === 'strong') return '✅ Strong';
+  if (s === 'review') return '⚠ Review';
+  return '🚨 Reteach';
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', function() {
+  initTeacherDashboard();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    ['attempts-modal', 'attempt-detail-modal', 'question-modal', 'grammar-modal', 'reteach-log-modal'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el && el.classList.contains('open')) el.classList.remove('open');
+    });
+  }
+});
+</script>

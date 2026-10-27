@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M3 SW Asia — Teacher Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cinzel+Decorative:wght@400;700&family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <?!= include('teacher-style'); ?>
+</head>
+<body>
+
+<div id="pin-gate">
+  <div class="pin-box">
+    <div class="pin-emoji">🔐</div>
+    <div class="pin-title">Teacher Access</div>
+    <div class="pin-sub">Enter the teacher PIN to view class analytics.</div>
+    <form id="pin-form" onsubmit="return handlePinSubmit(event)">
+      <div class="pin-field">
+        <input class="pin-input" id="pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••" autocomplete="off" autofocus>
+        <div class="pin-errmsg" id="pin-errmsg"></div>
+      </div>
+      <button class="pin-submit" id="pin-submit-btn" type="submit">Unlock Dashboard →</button>
+    </form>
+    <div class="pin-note">Ask the subject teacher for the PIN if you don't have it.</div>
+  </div>
+</div>
+
+<div id="dashboard" style="display:none;">
+
+  <header id="db-header">
+    <div class="db-header-left">
+      <span class="db-header-emoji">🎓</span>
+      <div>
+        <div class="db-header-title">M3 Southwest Asia — Teacher Dashboard</div>
+        <div class="db-header-sub">Formative Assessment Analytics · Physical Geography</div>
+      </div>
+    </div>
+    <div class="db-header-right">
+      <a class="db-header-link" id="db-sheet-link" href="#" target="_blank" rel="noopener noreferrer" title="Open data spreadsheet">📊 Open Sheet</a>
+      <button class="db-header-btn" onclick="logoutTeacher()" title="Lock dashboard">🔒 Lock</button>
+    </div>
+  </header>
+
+  <div id="db-controls">
+    <div class="db-control-group">
+      <label class="db-control-label">Section</label>
+      <select class="db-control-select" id="section-filter" onchange="refreshAll()">
+        <option value="ALL">All Sections Combined</option>
+        <option value="M3/10">M3/10 Only</option>
+        <option value="M3/11">M3/11 Only</option>
+      </select>
+    </div>
+    <div class="db-control-group">
+      <button class="db-refresh-btn" id="refresh-btn" onclick="refreshAll()">🔄 Refresh Data</button>
+    </div>
+    <div class="db-control-group" style="margin-left:auto;">
+      <span class="db-last-updated" id="last-updated">—</span>
+    </div>
+  </div>
+
+  <div id="db-loading">
+    <div class="db-loading-spinner"></div>
+    <div class="db-loading-text">Loading analytics…</div>
+  </div>
+
+  <div id="db-content" style="display:none;">
+
+    <section class="snapshot-section">
+      <h2 class="snapshot-title">📊 Class Snapshot</h2>
+      <div class="snapshot-grid" id="snapshot-grid"></div>
+      <div class="snapshot-priority" id="snapshot-priority"></div>
+    </section>
+
+    <section class="view-tabs-section">
+      <div class="view-tabs">
+        <button class="view-tab active" id="tab-quiz" onclick="switchView('quiz')">📝 Quiz Analytics</button>
+        <button class="view-tab" id="tab-grammar" onclick="switchView('grammar')">🏷️ Grammar Tagging</button>
+      </div>
+    </section>
+
+    <section id="quiz-view">
+      <div class="section-list" id="quiz-section-list"></div>
+    </section>
+
+    <section id="grammar-view" style="display:none;">
+      <div class="section-list" id="grammar-section-list"></div>
+    </section>
+
+  </div>
+
+</div>
+
+<div id="attempts-modal" class="modal-backdrop" onclick="closeModal(event,'attempts-modal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="attempts-modal-title">Student Attempts</div>
+      <button class="modal-close" onclick="closeModalBtn('attempts-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="attempts-modal-body"></div>
+  </div>
+</div>
+
+<div id="attempt-detail-modal" class="modal-backdrop" onclick="closeModal(event,'attempt-detail-modal')">
+  <div class="modal-box modal-box-wide" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="attempt-detail-modal-title">Attempt Detail</div>
+      <button class="modal-close" onclick="closeModalBtn('attempt-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="attempt-detail-modal-body"></div>
+  </div>
+</div>
+
+<div id="question-modal" class="modal-backdrop" onclick="closeModal(event,'question-modal')">
+  <div class="modal-box modal-box-wide" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="question-modal-title">Question Breakdown</div>
+      <button class="modal-close" onclick="closeModalBtn('question-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="question-modal-body"></div>
+  </div>
+</div>
+
+<div id="grammar-modal" class="modal-backdrop" onclick="closeModal(event,'grammar-modal')">
+  <div class="modal-box modal-box-wide" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="grammar-modal-title">Word Breakdown</div>
+      <button class="modal-close" onclick="closeModalBtn('grammar-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="grammar-modal-body"></div>
+  </div>
+</div>
+
+<div id="reteach-log-modal" class="modal-backdrop" onclick="closeModal(event,'reteach-log-modal')">
+  <div class="modal-box modal-box-wide" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="reteach-log-modal-title">📓 Log Reteach</div>
+      <button class="modal-close" onclick="closeModalBtn('reteach-log-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="reteach-log-modal-body"></div>
+  </div>
+</div>
+
+<?!= include('teacher-script'); ?>
+</body>
+</html>
